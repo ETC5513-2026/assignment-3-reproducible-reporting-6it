@@ -1,36 +1,33 @@
 ---
 title: "Expert advice from experts"
 author:
-- name: Professor Marie Curie
-  degrees: Nobel Prize, PhD
-  email: mcurie.notreal@gmail.com
-- name: Dr Pierre Curie
-  degrees: Nobel Prize, PhD
+- name: Somya Verma
+  degrees: BAEco(Hons), MBAt
+  email: sver0044@student.monash.edu
+- name: Daniel Loza
+  degrees: AMusA, BBus, BCom(Hons)
+- name: Yunhui Fan
+  degrees: BSc(Hons), MBAt
+- name: Yixiang Xu
+  degrees: BManSc, MBAt
 phone: (03) 9905 2478
 email: BusEco-Econometrics@monash.edu
-organization: Acme Corporation
+organization: 6it Consultants
 bibliography: references.bib
 format: report-pdf
 ---
 
+# Executive summary
+
 # Introduction
 
-In a famous paper, @BC64 introduced a family of transformations \dots
+# Methodology
 
-```{r}
-#| label: fig-density
-#| fig-cap: Simulated data from a N(0,1) distribution.
-library(tidyverse)
-set.seed(2022-12-20)
-df <- tibble(x = rnorm(200))
-df |>
-  ggplot(aes(x=x)) +
-  geom_density(bw = "sj") +
-  geom_rug()
-```
+# Results
 
-@fig-density shows a kernel density estimate of simulated data from a N(0,1) distribution. The sample variance is given by
-$$
-  s^2 = \frac{1}{n-1} \sum_{i=1}^n (x_i-\bar{x})^2 = `r round(sd(df$x), 2)`.
-$$ {#eq-s2}
-Note that @eq-s2 is an unbiased estimate of the variance, but it is not the maximum likelihood estimate [@Rice2007, p.269].
+# Discussion
+
+# Conclusion
+
+# Recommendations
+
