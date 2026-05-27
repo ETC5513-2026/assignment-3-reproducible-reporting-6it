@@ -5,8 +5,8 @@ Group Members:
 * Somya
 * Daniel
 * Yunhui
-* 
+* Yixiang
 
 Topic: 
 
-**Air Quality and its Impact on Health**
+**How does poor air quality affect respiratory health outcomes aross different countries or regions?**
