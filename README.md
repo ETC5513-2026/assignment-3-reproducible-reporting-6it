@@ -9,4 +9,4 @@ Group Members:
 
 Topic: 
 
-**How does poor air quality affect respiratory health outcomes aross different countries or regions?**
+**How does poor air quality affect respiratory health outcomes aross different countries or regions? How does this affect hospital intakes and pressure on the healthcare system?**
