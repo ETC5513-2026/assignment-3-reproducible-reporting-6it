@@ -1,11 +1,9 @@
 ---
-title: My great presentation
+title: Air Quality and Respiratory Health: An Analysis on Healthcare System Loading
 author: Hypatia of Alexandria
 date: today
 toc: false
 format: # Use only one of these
-  presentation-typst: default
-  presentation-beamer: default
   presentation-revealjs+letterbox: default
 ---
 
