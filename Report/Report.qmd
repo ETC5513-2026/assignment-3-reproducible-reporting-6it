@@ -70,6 +70,8 @@ top5_cities <- airquality_data %>%
   pull(city)
 
 # Step 2 - yearly summary for top 5 cities
+
+#(With Months)
 yearly_data <- airquality_data %>%
   filter(city %in% top5_cities,
          year %in% as.factor(2020:2025)) %>%
@@ -81,6 +83,7 @@ yearly_data <- airquality_data %>%
     .groups = "drop"
   )
 
+#(Without month)
 yearly_summary <- yearly_data %>%
   group_by(city, year) %>%
   summarise(
@@ -89,8 +92,9 @@ yearly_summary <- yearly_data %>%
     avg_hospital = mean(avg_hospital, na.rm = TRUE),
     .groups = "drop"
   )
-
-correlation_model lm(hospital_admissions ~ aqi + pm2_5 + pm10 + no2 + o3,
+```
+```{r Model-PM25-HospitalAdmission-Correlation}
+correlation_model <-lm(hospital_admissions ~ aqi + pm2_5 + pm10 + no2 + o3,
 data = airquality_data)
 
 summary(correlation_model)
@@ -108,8 +112,15 @@ ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
     y = "Hospital Admissions"
   ) +
   theme_minimal()
+```
 
-#Using correlation  between PM2.5 particles results to show evidence city wise a
+
+
+
+# Result 
+**Should be used in results**
+```{r}
+#Using correlation between PM2.5 particles and Hospital admission to provide evidence of relativeness between high pollution and hospital burden
 
 plot1 <- ggplot(yearly_summary, aes(x = year, y = avg_pm25, color = city, group = city)) +
   geom_line() +
@@ -142,16 +153,6 @@ plot1 / plot2 +
 
 ```{r}
 
-ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
-  geom_point(alpha = 0.2, color = "steelblue") +
-  geom_smooth(method = "lm", se = TRUE, color = "red") +
-  labs(
-    title = "Impact of PM2.5 on Hospital Admissions",
-    subtitle = "PM2.5 is the only statistically significant predictor (p < 2e-16)",
-    x = "PM2.5",
-    y = "Hospital Admissions"
-  ) +
-  theme_minimal()
 ```
 
 **this is an extra filteration we can use in result**
@@ -172,21 +173,5 @@ city_pollution_summary <- yearly_data %>%
     most_polluted_month = month[which.max(avg_aqi)]
   )
 ```
-```{r Plot-Methodology}
-
-ggplot(yearly_summary, aes(x = year, y = avg_hospital, color = city, group = city)) +
-  geom_line() +
-  geom_point() +
-  labs(
-    title = "Hospital Admissions in Top 5 Most Polluted Cities (2020-2025)",
-    x = "Year",
-    y = "Average Hospital Admissions",
-    color = "City"
-  ) +
-  theme_minimal()
-
-
-
-
-
+```{r}
 ```
