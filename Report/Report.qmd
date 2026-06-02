@@ -34,3 +34,159 @@ format: report-pdf
 
 # Recommendations
 
+\new page
+
+# Introduction 
+
+
+\new page
+
+# Methodology 
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(here)
+library(ggplot2)
+library(knitr)
+library(patchwork)
+```
+```{r reading-data}
+list.files("data")
+airquality_data <- read_csv("data/air_quality.csv")
+```
+```{r tidying-data}
+airquality_data<- airquality_data |> 
+  mutate(
+    month = month(date, label = TRUE, abbr= TRUE),
+    year = as.factor(year(date))
+  )
+# Step 1 - identify top 5 most polluted cities
+top5_cities <- airquality_data %>%
+  group_by(city) %>%
+  summarise(avg_aqi = mean(aqi, na.rm = TRUE)) %>%
+  arrange(desc(avg_aqi)) %>%
+  slice_head(n = 5) %>%
+  pull(city)
+
+# Step 2 - yearly summary for top 5 cities
+yearly_data <- airquality_data %>%
+  filter(city %in% top5_cities,
+         year %in% as.factor(2020:2025)) %>%
+  group_by(city, year, month) %>%
+  summarise(
+    avg_aqi = mean(aqi, na.rm = TRUE),
+    avg_pm25 = mean(pm2_5, na.rm = TRUE),
+    avg_hospital = mean(hospital_admissions, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+yearly_summary <- yearly_data %>%
+  group_by(city, year) %>%
+  summarise(
+    avg_aqi = mean(avg_aqi, na.rm = TRUE),
+    avg_pm25 = mean(avg_pm25, na.rm = TRUE),
+    avg_hospital = mean(avg_hospital, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+correlation_model lm(hospital_admissions ~ aqi + pm2_5 + pm10 + no2 + o3,
+data = airquality_data)
+
+summary(correlation_model)
+```
+
+```{r Plotting the model}
+
+ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
+  geom_point(alpha = 0.2, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(
+    title = "Correlation between Pollutants and Hospital Admissions",
+    subtitle = "PM2.5 is the only statistically significant predictor (p < 2e-16)",
+    x = "PM2.5",
+    y = "Hospital Admissions"
+  ) +
+  theme_minimal()
+
+#Using correlation  between PM2.5 particles results to show evidence city wise a
+
+plot1 <- ggplot(yearly_summary, aes(x = year, y = avg_pm25, color = city, group = city)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "PM2.5 Trends by City",
+    x = "Year",
+    y = "Average PM2.5",
+    color = "City"
+  ) +
+  theme_minimal()
+
+plot2 <- ggplot(yearly_summary, aes(x = year, y = avg_hospital, color = city, group = city)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Hospital Admissions by City",
+    x = "Year",
+    y = "Average Hospital Admissions",
+    color = "City"
+  ) +
+  theme_minimal()
+
+plot1 / plot2 +
+  plot_annotation(
+    title = "PM2.5 and Hospital Admissions Trends",
+    subtitle = "Top 5 Most Polluted Cities (2020-2025)"
+  )
+```
+
+```{r}
+
+ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
+  geom_point(alpha = 0.2, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(
+    title = "Impact of PM2.5 on Hospital Admissions",
+    subtitle = "PM2.5 is the only statistically significant predictor (p < 2e-16)",
+    x = "PM2.5",
+    y = "Hospital Admissions"
+  ) +
+  theme_minimal()
+```
+
+**this is an extra filteration we can use in result**
+
+```{r extra-info}
+# Identify top 5 most polluted months per city per year
+polluted_months <- yearly_data %>%
+  group_by(city, year) %>%
+  slice_max(avg_aqi, n = 5) %>%
+  ungroup()
+
+# Most polluted year and month per city
+city_pollution_summary <- yearly_data %>%
+  group_by(city) %>%
+  summarise(
+    avg_aqi = mean(avg_aqi, na.rm = TRUE),
+    most_polluted_year = year[which.max(avg_aqi)],
+    most_polluted_month = month[which.max(avg_aqi)]
+  )
+```
+```{r Plot-Methodology}
+
+ggplot(yearly_summary, aes(x = year, y = avg_hospital, color = city, group = city)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Hospital Admissions in Top 5 Most Polluted Cities (2020-2025)",
+    x = "Year",
+    y = "Average Hospital Admissions",
+    color = "City"
+  ) +
+  theme_minimal()
+
+
+
+
+
+```
