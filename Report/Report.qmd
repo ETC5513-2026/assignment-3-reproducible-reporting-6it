@@ -37,24 +37,33 @@ format: report-pdf
 \new page
 
 # Introduction 
-
+Question to investigate: **Impact on Hospital Intakes in top 5 most air-polluted cities from 2020-2025**
 
 \new page
 
 # Methodology 
-
-```{r}
+The analysis was conducted using R and several libraries from the tidyverse ecosystem for data cleaning, transformation, and visualisation. Additional packages including lubridate, ggplot2, kableExtra, and patchwork were used for date handling, plotting, and professional table formatting.
+```{r loading-library}
 library(tidyverse)
 library(lubridate)
 library(here)
 library(ggplot2)
 library(knitr)
 library(patchwork)
+library(kableExtra)
+
 ```
+
+The dataset contains daily air quality and healthcare observations from multiple cities between 2020 and 2025. Key variables include Air Quality Index (AQI), PM2.5, PM10, NO2, O3, temperature, humidity, and hospital admissions. The dataset was used to examine whether increasing pollution levels were associated with higher hospital intake rates in heavily polluted cities.
 ```{r reading-data}
 list.files("data")
 airquality_data <- read_csv("data/air_quality.csv")
 ```
+
+To identify the most polluted cities, the average AQI for each city was calculated using grouped summary statistics. Cities were then ranked according to their average AQI, and the top five most polluted cities were selected for further analysis.
+
+Daily observations were aggregated into monthly and yearly averages to reduce short-term fluctuations and improve trend interpretation. Average AQI, PM2.5 concentration, and hospital admissions were calculated for each city and year. These summaries were presented using formatted tables and visualisations.
+
 ```{r tidying-data}
 airquality_data<- airquality_data |> 
   mutate(
@@ -92,7 +101,20 @@ yearly_summary <- yearly_data %>%
     avg_hospital = mean(avg_hospital, na.rm = TRUE),
     .groups = "drop"
   )
+
+kable(yearly_summary %>%
+        select(city, year, avg_aqi) %>%
+        pivot_wider(names_from = year, values_from = avg_aqi) %>%
+        rename(City = city),
+      caption = "Average AQI by City and Year (2020-2025)",
+      digits = 2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%
+  column_spec(1, bold = TRUE) %>%
+  row_spec(0, bold = TRUE, background = "#steelblue", color = "white")
 ```
+
+A multiple linear regression model was used to examine the relationship between air pollution and hospital admissions. `Hospital admissions` were treated as the dependent variable, while AQI, PM2.5, PM10, NO2, and O3 were included as predictor variables.
+
 ```{r Model-PM25-HospitalAdmission-Correlation}
 correlation_model <-lm(hospital_admissions ~ aqi + pm2_5 + pm10 + no2 + o3,
 data = airquality_data)
@@ -100,6 +122,7 @@ data = airquality_data)
 summary(correlation_model)
 ```
 
+Scatterplots and regression lines were used to visualise the relationship between PM2.5 concentration and hospital admissions across the selected cities.
 ```{r Plotting the model}
 
 ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
@@ -113,8 +136,6 @@ ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
   ) +
   theme_minimal()
 ```
-
-
 
 
 # Result 
