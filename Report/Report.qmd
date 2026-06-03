@@ -205,5 +205,11 @@ city_pollution_summary <- yearly_data %>%
   )
 ```
 ```{r}
+month_pollute_plot <- ggplot(polluted_months,aes(x=month,y=avg_aqi,fill=city))+
+  geom_col(position="dodge",alpha=0.7)+
+  facet_wrap(~city,scales="free_y",ncol=2)+
+  labs(title="Top 5 highest-AQI months per city each year",x="Month",y="Average AQI")+
+  theme_minimal()
 
+month_pollute_plot
 ```
