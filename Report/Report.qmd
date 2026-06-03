@@ -34,12 +34,12 @@ format: report-pdf
 
 # Recommendations
 
-\new page
+\newpage
 
 # Introduction 
 Question to investigate: **Impact on Hospital Intakes in top 5 most air-polluted cities of world from 2020-2025**
 
-\new page
+\newpage
 
 # Methodology 
 The analysis was conducted using R and several libraries from the tidyverse ecosystem for data cleaning, transformation, and visualisation. Additional packages including lubridate, ggplot2, kableExtra, and patchwork were used for date handling, plotting, and professional table formatting.
@@ -110,7 +110,7 @@ kable(yearly_summary %>%
       digits = 2) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%
   column_spec(1, bold = TRUE) %>%
-  row_spec(0, bold = TRUE, background = "#steelblue", color = "white")
+  row_spec(0, bold = TRUE, background = "SteelBlue", color = "white")
 ```
 
 A multiple linear regression model was used to examine the relationship between air pollution and hospital admissions. `Hospital admissions` were treated as the dependent variable, while AQI, PM2.5, PM10, NO2, and O3 were included as predictor variables.
@@ -174,6 +174,16 @@ plot1 / plot2 +
 
 ```{r}
 
+aqi_long <- yearly_summary %>%
+  select(city,year,avg_aqi)
+
+bar_aqi <- ggplot(aqi_long,aes(x=year,y=avg_aqi,fill=city))+
+  geom_col(position = position_dodge(width=0.9),width=0.8)+
+  labs(title="Annual Average AQI across five cities (2020-2025)",x="Year",y="Average AQI",fill="City")+
+  geom_vline(xintercept = "2020", linetype="dashed",color="black")+
+  theme_minimal()
+
+bar_aqi
 ```
 
 **this is an extra filteration we can use in result**
@@ -195,4 +205,5 @@ city_pollution_summary <- yearly_data %>%
   )
 ```
 ```{r}
+
 ```
