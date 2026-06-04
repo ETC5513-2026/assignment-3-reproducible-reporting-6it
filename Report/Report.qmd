@@ -57,20 +57,20 @@ airquality_data<- airquality_data |>
     year = as.factor(year(date))
   )
 # Step 1 - identify top 5 most polluted cities
-top5_cities <- airquality_data %>%
-  group_by(city) %>%
-  summarise(avg_aqi = mean(aqi, na.rm = TRUE)) %>%
-  arrange(desc(avg_aqi)) %>%
-  slice_head(n = 5) %>%
+top5_cities <- airquality_data |>
+  group_by(city) |>
+  summarise(avg_aqi = mean(aqi, na.rm = TRUE)) |>
+  arrange(desc(avg_aqi)) |>
+  slice_head(n = 5) |>
   pull(city)
 
 # Step 2 - yearly summary for top 5 cities
 
 #(With Months)
-yearly_data <- airquality_data %>%
+yearly_data <- airquality_data |>
   filter(city %in% top5_cities,
-         year %in% as.factor(2020:2025)) %>%
-  group_by(city, year, month) %>%
+  as.factor(year(date)) %in% c("2020", "2021", "2022", "2023", "2024", "2025")) |>
+  group_by(city, year, month) |>
   summarise(
     avg_aqi = mean(aqi, na.rm = TRUE),
     avg_pm25 = mean(pm2_5, na.rm = TRUE),
@@ -79,8 +79,8 @@ yearly_data <- airquality_data %>%
   )
 
 #(Without month)
-yearly_summary <- yearly_data %>%
-  group_by(city, year) %>%
+yearly_summary <- yearly_data |>
+  group_by(city, year) |>
   summarise(
     avg_aqi = mean(avg_aqi, na.rm = TRUE),
     avg_pm25 = mean(avg_pm25, na.rm = TRUE),
@@ -88,14 +88,14 @@ yearly_summary <- yearly_data %>%
     .groups = "drop"
   )
 
-kable(yearly_summary %>%
-        select(city, year, avg_aqi) %>%
-        pivot_wider(names_from = year, values_from = avg_aqi) %>%
+kable(yearly_summary |>
+        select(city, year, avg_aqi) |>
+        pivot_wider(names_from = year, values_from = avg_aqi) |>
         rename(City = city),
       caption = "Average AQI by City and Year (2020-2025)",
-      digits = 2) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%
-  column_spec(1, bold = TRUE) %>%
+      digits = 2) |>
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered")) |>
+  column_spec(1, bold = TRUE) |>
   row_spec(0, bold = TRUE, background = "#4682B4", color = "white")
 ```
 
@@ -175,14 +175,14 @@ plot1 / plot2 +
 
 ```{r extra-info}
 # Identify top 5 most polluted months per city per year
-polluted_months <- yearly_data %>%
-  group_by(city, year) %>%
-  slice_max(avg_aqi, n = 5) %>%
+polluted_months <- yearly_data |>
+  group_by(city, year) |>
+  slice_max(avg_aqi, n = 5) |>
   ungroup()
 
 # Most polluted year and month per city
-city_pollution_summary <- yearly_data %>%
-  group_by(city) %>%
+city_pollution_summary <- yearly_data |>
+  group_by(city) |>
   summarise(
     avg_aqi = mean(avg_aqi, na.rm = TRUE),
     most_polluted_year = year[which.max(avg_aqi)],
