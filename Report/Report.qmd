@@ -257,3 +257,14 @@ The regression findings provide stronger evidence for the importance of PM2.5. T
 However, the analysis has several limitations. The adjusted R-squared value of 0.1539 indicates that the model explains only around 15.39% of the variation in hospital admissions. This means that many other factors, such as population size, age structure, chronic disease prevalence, healthcare access, seasonal respiratory illness, COVID-19 effects, and public health policies, are not captured in the model. In addition, because this study uses observational data, the results should be interpreted as evidence of association rather than direct causation. Differences in data collection methods across cities may also affect comparability.
 
 Overall, the findings have important public health implications. In highly polluted cities, PM2.5 should be treated as a key environmental indicator for predicting healthcare pressure. Rather than relying only on broad AQI measures, policymakers and healthcare planners should pay closer attention to fine particulate matter, especially during high-pollution seasons or months.
+
+# Conclusion
+
+This report examined air quality and hospital admission data from five highly polluted cities between 2020 and 2025, with the aim of understanding whether air pollution is associated with healthcare system loading. Using annual AQI summaries, PM2.5 and hospital admission trend graphs, multiple linear regression, and supplementary monthly pollution analysis, the study found that PM2.5 was the pollutant most strongly associated with hospital admissions.
+
+Although AQI, PM10, NO2, and O3 were not statistically significant in the regression model, PM2.5 showed a highly significant and positive relationship with hospital admissions. This means that, after controlling for other pollutants, higher PM2.5 levels were generally associated with higher hospital admission counts. The annual and monthly visualisations also support this conclusion, as periods of higher PM2.5 or heavier pollution tended to correspond with increased hospital admissions.
+
+However, air pollution is not the only factor affecting hospital admissions. Since the model explains only part of the variation in hospital intake, the findings should be interpreted as evidence of a significant association rather than direct causal proof. Future research could provide a more complete explanation by including population characteristics, seasonal disease patterns, healthcare capacity, and public health policy variables.
+
+Overall, the key conclusion of this report is that PM2.5 is the most important pollutant indicator among the five selected high-pollution cities, showing a significant positive association with hospital admissions and potentially increasing pressure on urban healthcare systems.
+
