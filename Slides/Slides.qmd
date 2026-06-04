@@ -1,9 +1,9 @@
 ---
-title: Air Quality and Respiratory Health: An Analysis on Healthcare System Loading
-author: Hypatia of Alexandria
+title: "Air Quality and Respiratory Health: An Analysis on Healthcare System Loading"
+author: "6it Consultants"
 date: today
 toc: false
-format: # Use only one of these
+format:
   presentation-revealjs+letterbox: default
 ---
 

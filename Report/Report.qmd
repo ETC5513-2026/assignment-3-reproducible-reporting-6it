@@ -18,30 +18,17 @@ toc: true
 format: report-pdf
 ---
 
-\newpage
+::: {.page-break}
+:::
 
 # Executive summary
 
 # Introduction
 
-# Methodology
-
-# Results
-
-# Discussion
-
-# Conclusion
-
-# Recommendations
-
-\new page
-
-# Introduction 
 Question to investigate: **Impact on Hospital Intakes in top 5 most air-polluted cities of world from 2020-2025**
 
-\new page
+# Methodology
 
-# Methodology 
 The analysis was conducted using R and several libraries from the tidyverse ecosystem for data cleaning, transformation, and visualisation. Additional packages including lubridate, ggplot2, kableExtra, and patchwork were used for date handling, plotting, and professional table formatting.
 ```{r loading-library}
 library(tidyverse)
@@ -56,8 +43,8 @@ library(kableExtra)
 
 The dataset contains daily air quality and healthcare observations from multiple cities between 2020 and 2025. Key variables include Air Quality Index (AQI), PM2.5, PM10, NO2, O3, temperature, humidity, and hospital admissions. The dataset was used to examine whether increasing pollution levels were associated with higher hospital intake rates in heavily polluted cities.
 ```{r reading-data}
-list.files("data")
-airquality_data <- read_csv("data/air_quality.csv")
+list.files(here("data"))
+airquality_data <- read_csv(here("data/air_quality.csv"))
 ```
 
 To identify the most polluted cities, the average AQI for each city was calculated using grouped summary statistics. Cities were then ranked according to their average AQI, and the top five most polluted cities were selected for further analysis.
@@ -110,7 +97,7 @@ kable(yearly_summary %>%
       digits = 2) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%
   column_spec(1, bold = TRUE) %>%
-  row_spec(0, bold = TRUE, background = "#steelblue", color = "white")
+  row_spec(0, bold = TRUE, background = "#4682B4", color = "white")
 ```
 
 A multiple linear regression model was used to examine the relationship between air pollution and hospital admissions. `Hospital admissions` were treated as the dependent variable, while AQI, PM2.5, PM10, NO2, and O3 were included as predictor variables.
@@ -126,7 +113,7 @@ Scatterplots and regression lines were used to visualise the relationship betwee
 ```{r Plotting the model}
 
 ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
-  geom_point(alpha = 0.2, color = "steelblue") +
+  geom_point(alpha = 0.2, color = "#4682B4") +
   geom_smooth(method = "lm", se = TRUE, color = "red") +
   labs(
     title = "Correlation between Pollutants and Hospital Admissions",
@@ -137,6 +124,16 @@ ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
   theme_minimal()
 ```
 
+# Results
+
+# Discussion
+
+# Conclusion
+
+# Recommendations
+
+::: {.page-break}
+:::
 
 # Result 
 **Should be used in results**
