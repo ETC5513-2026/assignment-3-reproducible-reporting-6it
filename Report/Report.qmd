@@ -131,10 +131,9 @@ ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
 
 # Recommendations
 
-::: {.page-break}
-:::
+\newpage
 
-# Result 
+# Potential Results
 **Should be used in results**
 ```{r}
 #Using correlation between PM2.5 particles and Hospital admission to provide evidence of relativeness between high pollution and hospital burden
