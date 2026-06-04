@@ -213,3 +213,7 @@ month_pollute_plot <- ggplot(polluted_months,aes(x=month,y=avg_aqi,fill=city))+
 
 month_pollute_plot
 ```
+
+This section presents descriptive pollution trends across five selected high-pollution cities, multivariate regression outcomes quantifying pollutant-hospitalisation links, and supplementary monthly extreme-pollution analysis, supported by tabular summaries and graphical visualisations. All analysis covers 2020 to 2025 daily observational data aggregated into monthly and annual averages to mitigate short-run random fluctuations.
+
+
