@@ -268,3 +268,14 @@ However, air pollution is not the only factor affecting hospital admissions. Sin
 
 Overall, the key conclusion of this report is that PM2.5 is the most important pollutant indicator among the five selected high-pollution cities, showing a significant positive association with hospital admissions and potentially increasing pressure on urban healthcare systems.
 
+# Recommendations
+
+Based on the findings, highly polluted cities should prioritise the monitoring and control of PM2.5. Since PM2.5 was the only statistically significant pollutant predictor in the regression model, governments and environmental agencies should not rely only on overall AQI values. Instead, they should pay closer attention to daily PM2.5 changes, long-term trends, and seasonal pollution peaks. During winter and high-pollution months, early warning systems should be used to advise residents to reduce outdoor exposure.
+
+Cities should adopt more targeted PM2.5 reduction strategies. These may include stricter industrial emission controls, greater use of clean energy, restrictions on high-emission vehicles, improved public transport, and encouragement of low-carbon travel. For cities such as Beijing and Cairo, where pollution levels remain high or volatile, policy should focus on continuous monitoring and rapid response. For cities such as São Paulo, where pollution appears to have declined substantially, further investigation could identify which policies or conditions contributed to improvement.
+
+Healthcare systems should incorporate air pollution data into hospital resource planning. Since higher PM2.5 levels are associated with increased hospital admissions, hospitals could prepare additional respiratory care resources, emergency staff, and bed capacity during high-pollution periods. Public health agencies could also use PM2.5 forecasts to warn high-risk groups, such as elderly people, children, asthma patients, and people with chronic respiratory diseases.
+
+Future research should improve the dataset and modelling approach. Additional control variables should be included, such as population size, age structure, healthcare capacity, seasonality, temperature, humidity, influenza outbreaks, and COVID-19 effects. This would help reduce omitted variable bias and improve the explanatory power of the model. City fixed effects or year fixed effects could also be used to better separate city-specific differences from time-based changes.
+
+
