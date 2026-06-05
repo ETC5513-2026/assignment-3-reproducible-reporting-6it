@@ -37,10 +37,11 @@ library(ggplot2)
 library(knitr)
 library(patchwork)
 library(kableExtra)
+library(broom)
 
 ```
 
-The dataset contains daily air quality and healthcare observations from multiple cities between 2020 and 2025. Key variables include Air Quality Index (AQI), PM2.5, PM10, NO2, O3, temperature, humidity, and hospital admissions. The dataset was used to examine whether increasing pollution levels were associated with higher hospital intake rates in heavily polluted cities.
+The dataset contains daily air quality and healthcare observations from multiple cities between 2020 and 2025. Key variables include Air Quality Index (AQI), PM2.5, PM10, NO2, O3, temperature, humidity, and hospital admissions. The 8 cities dataset was used to examine whether increasing pollution levels were associated with higher hospital intake rates in most and least polluted cities.
 ```{r reading-data}
 list.files(here("data"))
 airquality_data <- read_csv(here("data/air_quality.csv"))
@@ -134,6 +135,10 @@ top3_polluted_cities <- yearly_summary |>
       sum(yearly_total_hospital,
           na.rm = TRUE),
 
+    overall_avg_capacity =
+      mean(avg_hospital_capacity,
+           na.rm = TRUE),
+
     .groups = "drop"
   ) |>
 
@@ -157,13 +162,17 @@ least3_polluted_cities <- yearly_summary |>
   group_by(city) |>
 
   summarise(
-    
+
     overall_avg_aqi =
       mean(avg_aqi, na.rm = TRUE),
 
     overall_total_hospital =
       sum(yearly_total_hospital,
           na.rm = TRUE),
+
+    overall_avg_capacity =
+      mean(avg_hospital_capacity,
+           na.rm = TRUE),
 
     .groups = "drop"
   ) |>
@@ -240,6 +249,37 @@ data = airquality_data)
 
 summary(correlation_model)
 
+#Plotting Linear Regg Table
+
+tidy(correlation_model) |>
+
+  rename(
+    Variable = term,
+    Coefficient = estimate,
+    `Standard Error` = std.error,
+    `t value` = statistic,
+    `p value` = p.value
+  ) |>
+
+  kable(
+    caption =
+      "Linear Regression Results for Hospital Admissions",
+
+    digits = 4
+  ) |>
+
+  kable_styling(
+    bootstrap_options =
+      c("striped", "hover", "bordered")
+  ) |>
+
+  row_spec(
+    0,
+    bold = TRUE,
+    background = "#4682B4",
+    color = "white"
+  )
+
 ```
 
 Scatterplots and regression lines were used to visualise the relationship between PM2.5 concentration and hospital admissions across the selected cities.
@@ -260,6 +300,8 @@ ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
 
 ```
 
+
+
 # Results
 
 # Discussion
@@ -276,5 +318,90 @@ ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
 #Using correlation between PM2.5 particles and Hospital admission to provide evidence of relativeness between high pollution and hospital burden
 
 # Filter only the top 3 most polluted cities
+
+# Create pollution group labels
+
+comparison_yearly_data <- comparison_yearly_data |>
+
+  mutate(
+    pollution_group = case_when(
+
+      city %in% top3_polluted_cities$city
+        ~ "Top 3 Most Polluted",
+
+      city %in% least3_polluted_cities$city
+        ~ "3 Least Polluted"
+    )
+  )
+
+# PM2.5 trend plot
+
+plot1 <- ggplot(
+  comparison_yearly_data,
+
+  aes(
+    x = year,
+    y = avg_pm25,
+    color = city,
+    linetype = pollution_group,
+    group = city
+  )
+) +
+
+  geom_line(linewidth = 1) +
+
+  geom_point(size = 2) +
+
+  labs(
+    title = "PM2.5 Trends by City",
+    x = "Year",
+    y = "Average PM2.5",
+    color = "City",
+    linetype = "Pollution Group"
+  ) +
+
+  theme_minimal()
+
+# Hospital admissions trend plot
+
+plot2 <- ggplot(
+  comparison_yearly_data,
+
+  aes(
+    x = year,
+    y = yearly_total_hospital,
+    color = city,
+    linetype = pollution_group,
+    group = city
+  )
+) +
+
+  geom_line(linewidth = 1) +
+
+  geom_point(size = 2) +
+
+  labs(
+    title = "Hospital Admissions by City",
+    x = "Year",
+    y = "Yearly Total Hospital Admissions",
+    color = "City",
+    linetype = "Pollution Group"
+  ) +
+
+  theme_minimal()
+
+# Combine plots
+
+plot1 / plot2 +
+
+  plot_annotation(
+    title =
+      "Comparison of Pollution and Hospital Admissions",
+
+    subtitle =
+      "Top 3 Most vs 3 Least Polluted Cities (2020–2025)"
+  )
+
+```
 
 
