@@ -454,29 +454,34 @@ The regression model further identified PM2.5 as the strongest predictor of hosp
 
 **Several limitations** should be acknowledged: 
 
-First, the dataset only included a limited number of cities (8), reducing the ability to generalise findings globally. The data does not carry data previous to 2020 which makes it difficult to give a more broad look at the investigating question.
+* First, the dataset only included a limited number of cities (8), reducing the ability to generalise findings globally. The data does not carry data prior to 2020, which makes it difficult to establish a pre-Covid baseline for both hospital admissions and air quality metrics.
 
-Second, hospital admissions may also be influenced by factors not included in the analysis, such as population density, healthcare accessibility, socioeconomic conditions, smoking prevalence, and public health policies. 
+* Second, hospital admissions may also be influenced by factors not included in the analysis, such as population size and density, healthcare accessibility, socioeconomic conditions, smoking prevalence, and public health policies. 
 
-Third, yearly aggregation may hide short-term pollution spikes and seasonal health impacts.Fourth, the dataset has been taken at the courtesy of the *Kaggle* platform and hence cannot be relied to make any real-world conclusions or predictive analysis, based on the findings. It has been used solely for the purpose of teaching and understanding. 
+* Third, yearly aggregation may hide short-term pollution spikes and seasonal health impacts.
 
-In addition, cities classified as “least polluted” are according to the dataset and not the current global scenarios. However their high values during certain years, thus indicate that pollution remained a concern across most locations in the dataset. The analysis also focused on correlation rather than direct causation.
+* Fourth, the dataset has been taken at the courtesy of the [Kaggle](https://www.kaggle.com/datasets/tfisthis/global-air-quality-and-respiratory-health-outcomes) platform and hence cannot be relied to make any real-world conclusions or predictive analysis, based on the findings. It has been used solely for illustrative purposes and to build understanding of the health environment. 
+
+In addition, cities classified as “least polluted” are according to the dataset and not the current global scenarios. However, they recorded high pollution values within the dataset, indicating that pollution remains a concern for these cities. The analysis also focused only on correlation rather than any direct causation.
 
 # Conclusion
 
 This study examined the relationship between air pollution and hospital admissions across selected cities between 2020 and 2025. The findings demonstrated that cities with higher pollution levels generally experienced greater hospital burden. 
 
-PM2.5 was identified as the most statistically significant pollutant associated with hospital admissions. Both the regression model and visualisations showed a positive relationship between PM2.5 concentration and healthcare demand.
+`PM2.5` was identified as the most statistically significant pollutant associated with hospital admissions. Both the regression model and visualisations showed a positive relationship between `PM2.5` concentration and healthcare demand.
 
 
 # Recommendations
-On the basis of the above study and analysis on the dataset. Here are the following recommendation from consultant 6it
+
+On the basis of the above study and analysis on the dataset. Here are the following recommendation from 6it Consultants:
 
 * Governments should strengthen environmental regulations aimed at reducing PM2.5 emissions from traffic, industrial activities, and urban pollution sources.
 
 * Healthcare systems in highly polluted cities should improve hospital preparedness and respiratory healthcare capacity.
 
-* Future studies should include additional variables such as population density, healthcare access, and socioeconomic conditions to improve analysis accuracy.
+* Future studies should include additional variables, such as population density, healthcare access, and socioeconomic conditions to improve analysis accuracy.
+
+* Future investigation should take a more longitudinal approach, to better understand the impacts of Covid, and its associated lockdowns, on both air quality and hospital admissions, and to establish a clearer pre-Covid baseline.
 
 * Future research using daily or seasonal data may provide deeper insight into short-term pollution impacts on respiratory health.
 
