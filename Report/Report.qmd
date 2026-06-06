@@ -26,11 +26,11 @@ This report investigates the relationship between air pollution and hospital adm
 
 # Introduction
 
-Air pollution is a major public health issue causing respiratory issues leading to increased hospital admissions . Pollutants such as **PM2.5, PM10, NO2, and O3** can negatively affect human health, especially in highly urbanised cities. Among these pollutants, `PM2.5` is considered particularly harmful because it can penetrate deep into the lungs.
+Air pollution is a major public health issue causing respiratory problems leading to increased hospital admissions. Pollutants such as `PM2.5`, `PM10`, `NO2`, and `O3` can negatively affect human health, especially in high concentrations, which are commonly found in urbanised cities. Among these pollutants, `PM2.5` is considered particularly harmful because it can penetrate deep into the lungs.
 
-This report investigates how air pollution affected hospital admissions between 2020 and 2025 using air quality and healthcare data from multiple cities. Cities were ranked based on average AQI levels, allowing comparison between the **three most polluted** and **three least polluted** cities in the dataset.
+This report investigates how air pollution has affected hospital admissions between 2020 and 2025, using air quality and healthcare data from eight cities. Cities were ranked based on average AQI levels, allowing comparison between the **three most polluted** and **three least polluted** cities in the dataset.
 
-The study used descriptive analysis, visualisations, and regression modelling to examine whether higher pollution levels were associated with increased hospital burden, with a *particular focus on PM2.5 concentrations*.
+The study used descriptive analysis, visualisations, and regression modelling to examine whether higher pollution levels were associated with increased hospital burden, with a *particular focus on `PM2.5` concentrations*.
 
 # Methodology
 Question to investigate: How has airpollution affected hospital intakes in the most polluted cities in years 2020-2025
@@ -45,7 +45,6 @@ library(knitr)
 library(patchwork)
 library(kableExtra)
 library(broom)
-
 ```
 
 ```{r reading-data}
