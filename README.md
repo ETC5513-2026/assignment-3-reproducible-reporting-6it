@@ -9,4 +9,4 @@ Group Members:
 
 Topic: 
 
-**Impact on Hospital Intakes in top 5 most air-polluted cities from 2020-2025?**
+**How has airpollution affected hospital intakes in the most polluted cities in years 2020-2025**
