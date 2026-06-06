@@ -264,7 +264,7 @@ With the help of @fig-pollution-hospital-comparison we have arrived to the follo
 
 * The top 3 most polluted cities generally recorded higher PM2.5 concentrations and greater hospital admissions compared with the least polluted cities.
 
-**Note**: A noticeable decline in `PM2.5` levels was observed from 2020 to 2021 across most cities. This was likely influenced by COVID-19 lockdowns and global shutdown measures, which reduced vehicle usage, industrial activity, and overall emissions.
+**Note**: A noticeable decline in `PM2.5` levels was observed from 2020 to 2021 across most cities. This was likely influenced by COVID-19 lockdowns and global shutdown measures, which reduced vehicle usage, industrial activity, and overall emissions. Cross-country evidence verifies lockdown-induced emission cuts lowered particulate pollution globally [@ma2024].
 
 * Beijing consistently showed the highest hospital burden, with daily hospital admissions increasing to almost 900 in 2025.
 
