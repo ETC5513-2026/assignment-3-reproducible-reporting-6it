@@ -408,7 +408,7 @@ most_polluted_year <- yearly_summary |>
   )
 ```
 
-* @tbl-most-polluted-year identifies the most polluted year for each selected city based on AQI and PM2.5 concentrations.Cairo recorded the highest AQI value overall (417.60) in 2024, while São Paulo recorded the highest PM2.5 concentration (57.60) in 2020.
+* @tbl-most-polluted-year identifies the most polluted year for each selected city based on AQI and PM2.5 concentrations. Cairo recorded the highest AQI value overall (417.60) in 2024, while São Paulo recorded the highest PM2.5 concentration (57.60) in 2020.
 
 * @fig-pm25-scatter further supports this relationship by showing a positive trend between PM2.5 concentration and hospital admissions.
 ```{r most-polluted}
