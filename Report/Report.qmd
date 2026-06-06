@@ -266,7 +266,7 @@ With the help of @fig-pollution-hospital-comparison we have arrived to the follo
 
 **Note**: A noticeable decline in `PM2.5` levels was observed from 2020 to 2021 across most cities. This was likely influenced by COVID-19 lockdowns and global shutdown measures, which reduced vehicle usage, industrial activity, and overall emissions.
 
-* Beijing consistently showed the highest hospital burden, with hospital admissions increasing to almost 900 admissions in 2025.
+* Beijing consistently showed the highest hospital burden, with daily hospital admissions increasing to almost 900 in 2025.
 
 * Cairo recorded large fluctuations in pollution levels and experienced the highest AQI level overall during 2024.
 
@@ -411,6 +411,7 @@ most_polluted_year <- yearly_summary |>
 * @tbl-most-polluted-year identifies the most polluted year for each selected city based on AQI and PM2.5 concentrations. Cairo recorded the highest AQI value overall (417.60) in 2024, while São Paulo recorded the highest PM2.5 concentration (57.60) in 2020.
 
 * @fig-pm25-scatter further supports this relationship by showing a positive trend between PM2.5 concentration and hospital admissions.
+
 ```{r most-polluted}
 #| label: "tbl-most-polluted-year"
 #| tbl-cap: "Most Polluted Year for the Top 3 and Least 3 Polluted Cities (2020–2025)"
