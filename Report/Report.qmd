@@ -33,9 +33,10 @@ This report investigates how air pollution has affected hospital admissions betw
 The study used descriptive analysis, visualisations, and regression modelling to examine whether higher pollution levels were associated with increased hospital burden, with a *particular focus on `PM2.5` concentrations*.
 
 # Methodology
-Question to investigate: How has airpollution affected hospital intakes in the most polluted cities in years 2020-2025
+**Question to investigate:** [*How has air pollution affected hospital intakes in the most polluted cities in years 2020-2025?*]{.underline}
 
-The analysis was conducted using R and several packages from the tidyverse ecosystem for data cleaning, transformation, modelling, and visualisation. Libraries were used for date handling, plotting, table formatting, and regression analysis.
+The analysis was conducted using R and several packages from the `tidyverse` ecosystem for data cleaning, transformation, modelling, and visualisation. Libraries were used for date handling, plotting, table formatting, and regression analysis.
+
 ```{r loading-library}
 library(tidyverse)
 library(lubridate)
@@ -59,7 +60,7 @@ airquality_data<- airquality_data |>
   )
 ```
 
-The dataset contained daily air quality and healthcare observations from multiple cities between 2020 and 2025. Key variables included Air Quality Index (AQI), PM2.5, PM10, NO2, O3, temperature, humidity, hospital admissions, and hospital capacity. Daily observations were aggregated into monthly summaries and then yearly summaries to reduce short-term fluctuations and improve trend interpretation.
+The dataset contained daily air quality and healthcare observations from eight cities between 2020 and 2025. Key variables included Air Quality Index (AQI), PM2.5, PM10, NO2, O3, temperature, humidity, hospital admissions, and hospital capacity. Daily observations were aggregated into monthly summaries and then yearly summaries to reduce short-term fluctuations and improve trend interpretation.
 
 ```{r classification-of-data}
 # Step 2 — Club all daily data into monthly summaries
@@ -199,7 +200,9 @@ data = airquality_data)
 
 summary(correlation_model)
 ```
-```{r tbl-regression-results}
+```{r regression-table}
+#| fig-pos: "H"
+#| label: "tbl-regression-results"
 #| tbl-cap: "Linear Regression Results for Hospital Admissions"
 
 #Plotting Linear Regg Table
@@ -235,8 +238,11 @@ tidy(correlation_model) |>
 
 ```
 
-@fig-pm25-scatter presents a scatterplot and fitted regression line showing the relationship between PM2.5 concentration and hospital admissions. The positive slope of the regression line suggests that *hospital admissions tended to increase* as *PM2.5 concentrations increased*, supporting the relationship identified in the regression model.
-```{r fig-pm25-scatter}
+@tbl-regression-results shows the regression results for the model examining the relationship between air pollutants and hospital admissions. The table indicates that PM2.5 is the only statistically significant predictor of hospital admissions (p < 0.05), while AQI, PM10, NO2, and O3 do not show a significant association with hospital admissions in this model. As such, only PM2.5 was used for further analysis and visualisation to explore its relationship with hospital admissions.
+
+```{r correlation-plot}
+#| fig-pos: "H"
+#| label: "fig-pm25-scatter"
 #| fig-cap: "Correlation between Pollutants and Hospital Admissions"
 
 ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
@@ -244,15 +250,14 @@ ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
   geom_smooth(method = "lm", se = TRUE, color = "red") +
   labs(
     title = "Correlation between Pollutants and Hospital Admissions",
-    subtitle = "PM2.5 is the only statistically significant predictor (p < 2e-16)",
+    subtitle = "PM2.5 is the only statistically significant predictor (p < 0.05)",
     x = "PM2.5",
     y = "Hospital Admissions"
   ) +
   theme_minimal()
-
-
-
 ```
+
+@fig-pm25-scatter presents a scatterplot and fitted regression line showing the relationship between PM2.5 concentration and hospital admissions. The positive slope of the regression line suggests that *hospital admissions tended to increase* as *PM2.5 concentrations increased*, supporting the relationship identified in the regression model.
 
 # Potential Results
 With help of @fig-pollution-hospital-comparison we have arrived to the following potential results: 
