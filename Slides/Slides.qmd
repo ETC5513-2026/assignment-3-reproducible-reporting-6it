@@ -1,89 +1,450 @@
 ---
-title: Air Quality and Respiratory Health: An Analysis on Healthcare System Loading
-author: Hypatia of Alexandria
+title: "Air Quality and Respiratory Health: <br> An Analysis on Healthcare System Loading"
+author: "6it Consultants"
 date: today
 toc: false
-format: # Use only one of these
+bibliography: 
+  - references.bib
+  - packages.bib
+format:
   presentation-revealjs+letterbox: default
 ---
 
-```{r}
-#| label: load-packages
+```{r loading-library}
 #| include: false
-library(knitr)
+
+library(tidyverse)
+library(lubridate)
+library(here)
 library(ggplot2)
-library(dplyr)
-options(width = 70)
+library(knitr)
+library(patchwork)
+library(kableExtra)
+library(broom)
 ```
 
-# Goals
+```{r reading-data}
+#| include: false
 
-## Goals
-
-
-The main goals for this slide:
-
-- This is just to show you how this \emph{template} works
-- The blue in this template is based on the official Monash University color palette
-
-### beamer options
-
-- Use the `titlegraphic` option to include a different background image for the title slide
-- Use the `titlecolor` option to change the color for the text on the title slide.
-
-# Tables and graphs
-
-## Slide 2
-
-A nice table
-
-```{r}
-mtcars |>
-  select(mpg:wt) |>
-  head() |>
-  kable(booktabs = TRUE)
+airquality_data <- read_csv(here("data/air_quality.csv"))
 ```
 
-## Slide 3
+```{r tidying-data}
+#| include: false
 
-And a graph
-
-```{r}
-#| fig-height: 3.8
-mtcars |>
-  ggplot(aes(x=wt, y = mpg)) +
-  geom_point()
+airquality_data<- airquality_data |> 
+  mutate(
+    month = month(date, label = TRUE, abbr= TRUE),
+    year = as.factor(year(date))
+  )
 ```
 
-## Slide 4
+```{r build-package-bib}
+#|include: false
 
-The sample standard deviation is given by
-$$
-  s = \sqrt{\frac{1}{n-1} \sum_{i=1}^n (x_i - \bar{x})^2}
-$$
-
-## Testing monospace font
-
-```{r}
-#| echo: true
-mtcars |> as_tibble() |> head()
+knitr::write_bib(
+  c(
+    "tidyverse",
+    "lubridate",
+    "here",
+    "ggplot2",
+    "knitr",
+    "patchwork",
+    "kableExtra",
+    "broom"
+  ),
+  "packages.bib"
+)
 ```
 
+## Problem Introduction
 
-## Testing math fonts
+::: columns
 
-* Calligraphic
+::: {.column width="60%"}
+- Air pollution is a major public health issue causing respiratory problems leading to increased hospital admissions
+- We will explore data on air pollution levels and hospital admissions in 8 major cities across 2020–2025
+- This presentation will examine how air pollution has affected hospital intakes in the most polluted cities in the years 2020-2025
+:::
 
-  * $\mathcal{ABCDE}$
+::: {.column width="40%"}
+![Credit: Thoracic and Sleep Group](air-polution-illustration.png){width="100%"}
+:::
 
-* Script
+:::
 
-  * $\mathscr{ABCDE}$
+## Dataset Exploration
 
-* Fraktur
+- The dataset contained daily air quality and healthcare observations from eight cities between 2020 and 2025. 
 
-  * $\mathfrak{ABCDE}$
+- Key variables included: `Air Quality Index (AQI)`, `PM2.5`, `PM10`, `NO2`, `O3`, `temperature`, `humidity`, `hospital admissions`, and `hospital capacity`. 
 
-* Mathbb
+- Daily observations were aggregated into monthly summaries and then yearly summaries to reduce short-term fluctuations and improve trend interpretation.
 
-  * $\mathbb{ABCDE}$
+## Methodology
+
+The analysis was conducted using R and several packages from the `tidyverse` [@R-tidyverse] ecosystem for data cleaning, transformation, modelling, and visualisation. 
+
+The following ibraries were used:
+
+::: {style="font-size: 0.8em;"}
+
+- `lubridate` [@R-lubridate] for date manipulation
+
+- `ggplot2` [@R-ggplot2] for data visualisation
+
+- `patchwork` [@R-patchwork] for combining multiple plots
+
+- `kableExtra` [@R-kableExtra] for enhanced table formatting
+
+- `broom` [@R-broom] for tidying regression outputs
+
+- `here` [@R-here] for reproducible file paths
+
+:::
+
+## Regression
+
+```{r classification-of-data}
+# Step 2 — Club all daily data into monthly summaries
+
+monthly_summary <- airquality_data |>
+
+  group_by(city, year, month) |>
+
+  summarise(
+    avg_aqi = mean(aqi, na.rm = TRUE),
+    avg_pm25 = mean(pm2_5, na.rm = TRUE),
+    avg_pm10 = mean(pm10, na.rm = TRUE),
+    avg_no2 = mean(no2, na.rm = TRUE),
+    avg_o3 = mean(o3, na.rm = TRUE),
+
+    avg_temperature =
+      mean(temperature, na.rm = TRUE),
+
+    avg_humidity =
+      mean(humidity, na.rm = TRUE),
+
+    total_hospital =
+      sum(hospital_admissions, na.rm = TRUE),
+
+    avg_hospital_capacity =
+      mean(hospital_capacity, na.rm = TRUE),
+
+    .groups = "drop"
+  )
+
+# Step 3 — Club all months into yearly summaries
+
+yearly_summary <- monthly_summary |>
+
+  group_by(city, year) |>
+    summarise(
+    avg_aqi = mean(avg_aqi, na.rm = TRUE),
+    avg_pm25 = mean(avg_pm25, na.rm = TRUE),
+    avg_pm10 = mean(avg_pm10, na.rm = TRUE),
+    avg_no2 = mean(avg_no2, na.rm = TRUE),
+    avg_o3 = mean(avg_o3, na.rm = TRUE),
+
+    avg_temperature =
+      mean(avg_temperature, na.rm = TRUE),
+
+    avg_humidity =
+      mean(avg_humidity, na.rm = TRUE),
+
+    yearly_total_hospital =
+      sum(total_hospital, na.rm = TRUE),
+
+    avg_hospital_capacity =
+      mean(avg_hospital_capacity, na.rm = TRUE),
+
+    .groups = "drop"
+  )
+```
+
+```{r top-3-polluted-cities}
+# step 3
+top3_polluted_cities <- yearly_summary |>
+
+  filter(
+    year %in%
+      c("2020", "2021", "2022",
+        "2023", "2024", "2025")
+  ) |>
+
+  group_by(city) |>
+
+  summarise(
+    overall_avg_aqi =
+      mean(avg_aqi, na.rm = TRUE),
+
+    overall_total_hospital =
+      sum(yearly_total_hospital,
+          na.rm = TRUE),
+
+    overall_avg_capacity =
+      mean(avg_hospital_capacity,
+           na.rm = TRUE),
+
+    .groups = "drop"
+  ) |>
+
+  arrange(
+    desc(overall_avg_aqi)
+  ) |>
+
+  slice_head(n = 3)
+```
+
+```{r 3-least-polluted-cities}
+least3_polluted_cities <- yearly_summary |>
+
+  filter(
+    year %in%
+      c("2020", "2021", "2022",
+        "2023", "2024", "2025")
+  ) |>
+
+  group_by(city) |>
+
+  summarise(
+
+    overall_avg_aqi =
+      mean(avg_aqi, na.rm = TRUE),
+
+    overall_total_hospital =
+      sum(yearly_total_hospital,
+          na.rm = TRUE),
+
+    overall_avg_capacity =
+      mean(avg_hospital_capacity,
+           na.rm = TRUE),
+
+    .groups = "drop"
+  ) |>
+
+  arrange(
+    overall_avg_aqi
+  ) |>
+
+  slice_head(n = 3)
+```
+
+```{r Model-PM25-HospitalAdmission-Correlation}
+#| echo: false
+#| include: false
+correlation_model <-lm(hospital_admissions ~ aqi + pm2_5 + pm10 + no2 + o3,
+data = airquality_data)
+
+summary(correlation_model)
+```
+
+::: columns
+
+::: {.column width="50%"}
+```{r regression-table}
+#| fig-pos: "H"
+#| label: "tbl-regression-results"
+#| tbl-cap: "Linear Regression Results for Hospital Admissions"
+tidy(correlation_model) |>
+
+  rename(
+    Variable = term,
+    Coefficient = estimate,
+    `Standard Error` = std.error,
+    `t value` = statistic,
+    `p value` = p.value
+  ) |>
+
+  kable(
+    digits = 4
+  ) |>
+
+  kable_styling(
+    font_size = 22
+  ) |>
+
+  row_spec(
+    0,
+    bold = TRUE,
+    background = "#4682B4",
+    color = "white"
+  )
+```
+:::
+
+::: {.column width="50%"}
+```{r correlation-plot}
+#| fig-pos: "H"
+#| label: "fig-pm25-scatter"
+#| fig-cap: "Correlation between Pollutants and Hospital Admissions"
+
+ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
+  geom_point(alpha = 0.2, color = "#4682B4") +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(
+    title = "Correlation between Pollutants and Hospital Admissions",
+    subtitle = "PM2.5 is the only statistically significant predictor (p < 0.05)",
+    x = "PM2.5",
+    y = "Hospital Admissions"
+  ) +
+  theme_minimal()
+```
+:::
+
+:::
+
+The regression analysis revealed that `PM2.5` levels were significantly positively associated with `hospital admissions` (p < 0.05), while other pollutants did not show a statistically significant relationship.
+
+## Results
+
+::: columns
+
+::: {.column width="58%"}
+
+```{r comparison-plot}
+#| label: "fig-pollution-hospital-comparison"
+#| fig-cap: "Comparison of Pollution and Hospital Admissions Between the 3 Most Vs 3 Least Polluted Cities (2020–2025)"
+
+
+comparison_yearly_data <- yearly_summary |>
+
+  filter(
+    city %in% c(
+      top3_polluted_cities$city,
+      least3_polluted_cities$city
+    ),
+
+    year %in%
+      c("2020", "2021", "2022",
+        "2023", "2024", "2025")
+  )
+
+comparison_yearly_data <- comparison_yearly_data |>
+
+  mutate(
+    pollution_group = case_when(
+
+      city %in% top3_polluted_cities$city
+        ~ "3 Most Polluted",
+
+      city %in% least3_polluted_cities$city
+        ~ "3 Least Polluted"
+    )
+  )
+
+# PM2.5 trend plot
+
+plot1 <- ggplot(
+  comparison_yearly_data,
+
+  aes(
+    x = year,
+    y = avg_pm25,
+    color = city,
+    linetype = pollution_group,
+    group = city
+  )
+) +
+
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+
+  labs(
+    title = "PM2.5 Trends by City",
+    x = "Year",
+    y = "Average PM2.5",
+    color = "City",
+    linetype = "Pollution Category"
+) +
+
+  theme_minimal()
+
+# Hospital admissions trend plot
+
+plot2 <- ggplot(
+  comparison_yearly_data,
+
+  aes(
+    x = year,
+    y = yearly_total_hospital,
+    color = city,
+    linetype = pollution_group,
+    group = city
+  )
+) +
+
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+
+  labs(
+  title = "Hospital Admissions by City",
+  x = "Year",
+  y = "Yearly Total Hospital Admissions",
+  color = "City",
+  linetype = "Pollution Category"
+) +
+
+  theme_minimal()
+
+# Combine plots with shared legend
+
+(plot1 / plot2) +
+
+  plot_layout(guides = "collect") +
+
+  theme(
+    legend.position = "right",
+    legend.box = "vertical"
+  )
+```
+
+:::
+
+::: {.column width="42%"}
+
+::: {style="font-size: 0.8em;"}
+
+- The 3 most polluted cities recorded higher PM2.5 levels and greater hospital admissions, while the least polluted cities showed lower and more stable trends.
+- PM2.5 levels declined sharply from 2020 to 2021, likely due to COVID-19 lockdowns reducing emissions.
+- Similar trends between pollution levels and hospital admissions suggest a relationship between air pollution and healthcare burden.
+
+:::
+
+:::
+
+:::
+
+## Limitations
+
+::: {style="font-size: 0.85em;"}
+
+- First, the dataset only included a limited number of cities (8), reducing the ability to generalise findings globally. The data does not carry data prior to 2020, which makes it difficult to establish a pre-Covid baseline for both hospital admissions and air quality metrics.
+
+- Second, hospital admissions may also be influenced by factors not included in the analysis, such as population size and density, healthcare accessibility, socioeconomic conditions, smoking prevalence, and public health policies. 
+
+- Third, yearly aggregation may hide short-term pollution spikes and seasonal health impacts.
+
+- Fourth, the dataset has been taken at the courtesy of the [Kaggle](https://www.kaggle.com/datasets/tfisthis/global-air-quality-and-respiratory-health-outcomes) platform and hence cannot be relied to make any real-world conclusions or predictive analysis, based on the findings. It has been used solely for illustrative purposes and to build understanding of the health environment. 
+
+:::
+
+## Recommendation
+
+::: {style="font-size: 0.825em;"}
+
+* Governments should strengthen environmental regulations aimed at reducing PM2.5 emissions from traffic, industrial activities, and urban pollution sources.
+
+* Healthcare systems in highly polluted cities should improve hospital preparedness and respiratory healthcare capacity.
+
+* Future studies should include additional variables, such as population density, healthcare access, and socioeconomic conditions to improve analysis accuracy.
+
+* Future investigation should take a more longitudinal approach, to better understand the impacts of Covid, and its associated lockdowns, on both air quality and hospital admissions, and to establish a clearer pre-Covid baseline.
+
+* Future research using daily or seasonal data may provide deeper insight into short-term pollution impacts on respiratory health.
+
+* Public awareness campaigns should encourage protective measures during periods of poor air quality.
+
+:::
+
+## References

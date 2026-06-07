@@ -13,7 +13,9 @@ author:
 phone: (03) 9905 2478
 email: BusEco-Econometrics@monash.edu
 organization: 6it Consultants
-bibliography: references.bib
+bibliography: 
+  - references.bib
+  - packages.bib
 toc: true
 format: report-pdf
 ---
@@ -22,27 +24,21 @@ format: report-pdf
 
 # Executive summary
 
+This report investigates the relationship between air pollution and hospital admissions between 2020 and 2025. The analysis compared the three most polluted and three least polluted cities using AQI, PM2.5, and hospital admission data. Regression analysis showed that PM2.5 was the only statistically significant pollutant associated with hospital admissions. Overall, the findings suggest that higher PM2.5 concentrations leading to higher AQI, were linked to increased hospital burden across the selected cities.
+
 # Introduction
 
+Air pollution is a major public health issue causing respiratory problems leading to increased hospital admissions. Pollutants such as `PM2.5`, `PM10`, `NO2`, and `O3` can negatively affect human health, especially in high concentrations, which are commonly found in urbanised cities. Among these pollutants, `PM2.5` is considered particularly harmful because it can penetrate deep into the lungs.
+
+This report investigates how air pollution has affected hospital admissions between 2020 and 2025, using air quality and healthcare data from eight cities. Cities were ranked based on average AQI levels, allowing comparison between the **three most polluted** and **three least polluted** cities in the dataset.
+
+The study used descriptive analysis, visualisations, and regression modelling to examine whether higher pollution levels were associated with increased hospital burden, with a *particular focus on `PM2.5` concentrations*.
+
 # Methodology
+**Question to investigate:** [*How has air pollution affected hospital intakes in the most polluted cities in years 2020-2025?*]{.underline}
 
-# Results
+The analysis was conducted using R and several packages from the `tidyverse` ecosystem for data cleaning, transformation, modelling, and visualisation. Libraries were used for date handling, plotting, table formatting, and regression analysis.
 
-# Discussion
-
-# Conclusion
-
-# Recommendations
-
-\newpage
-
-# Introduction 
-Question to investigate: **Impact on Hospital Intakes in top 5 most air-polluted cities of world from 2020-2025**
-
-\newpage
-
-# Methodology 
-The analysis was conducted using R and several libraries from the tidyverse ecosystem for data cleaning, transformation, and visualisation. Additional packages including lubridate, ggplot2, kableExtra, and patchwork were used for date handling, plotting, and professional table formatting.
 ```{r loading-library}
 library(tidyverse)
 library(lubridate)
@@ -51,18 +47,29 @@ library(ggplot2)
 library(knitr)
 library(patchwork)
 library(kableExtra)
+library(broom)
+```
+
+```{r create-package-bib}
+knitr::write_bib(
+  c(
+    "tidyverse",
+    "lubridate",
+    "here",
+    "ggplot2",
+    "knitr",
+    "patchwork",
+    "kableExtra",
+    "broom"
+  ),
+  "packages.bib"
+)
 
 ```
 
-The dataset contains daily air quality and healthcare observations from multiple cities between 2020 and 2025. Key variables include Air Quality Index (AQI), PM2.5, PM10, NO2, O3, temperature, humidity, and hospital admissions. The dataset was used to examine whether increasing pollution levels were associated with higher hospital intake rates in heavily polluted cities.
 ```{r reading-data}
-list.files("data")
-airquality_data <- read_csv("data/air_quality.csv")
+airquality_data <- read_csv(here("data/air_quality.csv"))
 ```
-
-To identify the most polluted cities, the average AQI for each city was calculated using grouped summary statistics. Cities were then ranked according to their average AQI, and the top five most polluted cities were selected for further analysis.
-
-Daily observations were aggregated into monthly and yearly averages to reduce short-term fluctuations and improve trend interpretation. Average AQI, PM2.5 concentration, and hospital admissions were calculated for each city and year. These summaries were presented using formatted tables and visualisations.
 
 ```{r tidying-data}
 airquality_data<- airquality_data |> 
@@ -70,212 +77,431 @@ airquality_data<- airquality_data |>
     month = month(date, label = TRUE, abbr= TRUE),
     year = as.factor(year(date))
   )
-# Step 1 - identify top 5 most polluted cities
-top5_cities <- airquality_data %>%
-  group_by(city) %>%
-  summarise(avg_aqi = mean(aqi, na.rm = TRUE)) %>%
-  arrange(desc(avg_aqi)) %>%
-  slice_head(n = 5) %>%
-  pull(city)
+```
 
-# Step 2 - yearly summary for top 5 cities
+The dataset contained daily air quality and healthcare observations from eight cities between 2020 and 2025. Key variables included Air Quality Index (AQI), PM2.5, PM10, NO2, O3, temperature, humidity, hospital admissions, and hospital capacity. Daily observations were aggregated into monthly summaries and then yearly summaries to reduce short-term fluctuations and improve trend interpretation.
 
-#(With Months)
-yearly_data <- airquality_data %>%
-  filter(city %in% top5_cities,
-         year %in% as.factor(2020:2025)) %>%
-  group_by(city, year, month) %>%
+```{r classification-of-data}
+# Step 2 — Club all daily data into monthly summaries
+
+monthly_summary <- airquality_data |>
+
+  group_by(city, year, month) |>
+
   summarise(
     avg_aqi = mean(aqi, na.rm = TRUE),
     avg_pm25 = mean(pm2_5, na.rm = TRUE),
-    avg_hospital = mean(hospital_admissions, na.rm = TRUE),
+    avg_pm10 = mean(pm10, na.rm = TRUE),
+    avg_no2 = mean(no2, na.rm = TRUE),
+    avg_o3 = mean(o3, na.rm = TRUE),
+
+    avg_temperature =
+      mean(temperature, na.rm = TRUE),
+
+    avg_humidity =
+      mean(humidity, na.rm = TRUE),
+
+    total_hospital =
+      sum(hospital_admissions, na.rm = TRUE),
+
+    avg_hospital_capacity =
+      mean(hospital_capacity, na.rm = TRUE),
+
     .groups = "drop"
   )
 
-#(Without month)
-yearly_summary <- yearly_data %>%
-  group_by(city, year) %>%
-  summarise(
+# Step 3 — Club all months into yearly summaries
+
+yearly_summary <- monthly_summary |>
+
+  group_by(city, year) |>
+    summarise(
     avg_aqi = mean(avg_aqi, na.rm = TRUE),
     avg_pm25 = mean(avg_pm25, na.rm = TRUE),
-    avg_hospital = mean(avg_hospital, na.rm = TRUE),
+    avg_pm10 = mean(avg_pm10, na.rm = TRUE),
+    avg_no2 = mean(avg_no2, na.rm = TRUE),
+    avg_o3 = mean(avg_o3, na.rm = TRUE),
+
+    avg_temperature =
+      mean(avg_temperature, na.rm = TRUE),
+
+    avg_humidity =
+      mean(avg_humidity, na.rm = TRUE),
+
+    yearly_total_hospital =
+      sum(total_hospital, na.rm = TRUE),
+
+    avg_hospital_capacity =
+      mean(avg_hospital_capacity, na.rm = TRUE),
+
     .groups = "drop"
   )
-
-kable(yearly_summary %>%
-        select(city, year, avg_aqi) %>%
-        pivot_wider(names_from = year, values_from = avg_aqi) %>%
-        rename(City = city),
-      caption = "Average AQI by City and Year (2020-2025)",
-      digits = 2) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%
-  column_spec(1, bold = TRUE) %>%
-  row_spec(0, bold = TRUE, background = "SteelBlue", color = "white")
 ```
 
-A multiple linear regression model was used to examine the relationship between air pollution and hospital admissions. `Hospital admissions` were treated as the dependent variable, while AQI, PM2.5, PM10, NO2, and O3 were included as predictor variables.
+Cities were ranked according to average AQI values from 2020–2025. The three most polluted and three least polluted cities were selected for comparison. 
+
+```{r top-3-polluted-cities}
+# step 3
+top3_polluted_cities <- yearly_summary |>
+
+  filter(
+    year %in%
+      c("2020", "2021", "2022",
+        "2023", "2024", "2025")
+  ) |>
+
+  group_by(city) |>
+
+  summarise(
+    overall_avg_aqi =
+      mean(avg_aqi, na.rm = TRUE),
+
+    overall_total_hospital =
+      sum(yearly_total_hospital,
+          na.rm = TRUE),
+
+    overall_avg_capacity =
+      mean(avg_hospital_capacity,
+           na.rm = TRUE),
+
+    .groups = "drop"
+  ) |>
+
+  arrange(
+    desc(overall_avg_aqi)
+  ) |>
+
+  slice_head(n = 3)
+
+```
+
+```{r 3-least-polluted-cities}
+least3_polluted_cities <- yearly_summary |>
+
+  filter(
+    year %in%
+      c("2020", "2021", "2022",
+        "2023", "2024", "2025")
+  ) |>
+
+  group_by(city) |>
+
+  summarise(
+
+    overall_avg_aqi =
+      mean(avg_aqi, na.rm = TRUE),
+
+    overall_total_hospital =
+      sum(yearly_total_hospital,
+          na.rm = TRUE),
+
+    overall_avg_capacity =
+      mean(avg_hospital_capacity,
+           na.rm = TRUE),
+
+    .groups = "drop"
+  ) |>
+
+  arrange(
+    overall_avg_aqi
+  ) |>
+
+  slice_head(n = 3)
+```
+
+A multiple linear regression model was used to examine the relationship between air pollutants and hospital admissions. `Hospital admissions` were treated as the dependent variable, while `AQI`, `PM2.5`, `PM10`, `NO2`, and `O3` were used as predictor variables. The regression results shown in @tbl-regression-results indicate that PM2.5 was the only statistically significant predictor of hospital admissions used further for analysis. 
 
 ```{r Model-PM25-HospitalAdmission-Correlation}
+#| echo: false
+#| include: false
 correlation_model <-lm(hospital_admissions ~ aqi + pm2_5 + pm10 + no2 + o3,
 data = airquality_data)
 
 summary(correlation_model)
 ```
+```{r regression-table}
+#| fig-pos: "H"
+#| label: "tbl-regression-results"
+#| tbl-cap: "Linear Regression Results for Hospital Admissions"
 
-Scatterplots and regression lines were used to visualise the relationship between PM2.5 concentration and hospital admissions across the selected cities.
-```{r Plotting the model}
+#Plotting Linear Regg Table
+
+tidy(correlation_model) |>
+
+  rename(
+    Variable = term,
+    Coefficient = estimate,
+    `Standard Error` = std.error,
+    `t value` = statistic,
+    `p value` = p.value
+  ) |>
+
+  kable(
+    caption =
+      "Linear Regression Results for Hospital Admissions",
+
+    digits = 4
+  ) |>
+
+  kable_styling(
+    latex_options =
+      c("striped", "hold_position")
+  ) |>
+
+  row_spec(
+    0,
+    bold = TRUE,
+    background = "#4682B4",
+    color = "white"
+  )
+
+```
+
+@tbl-regression-results shows the regression results for the model examining the relationship between air pollutants and hospital admissions. The table indicates that PM2.5 is the only statistically significant predictor of hospital admissions (p < 0.05), while AQI, PM10, NO2, and O3 do not show a significant association with hospital admissions in this model. As such, only PM2.5 was used for further analysis and visualisation to explore its relationship with hospital admissions.
+
+```{r correlation-plot}
+#| fig-pos: "H"
+#| label: "fig-pm25-scatter"
+#| fig-cap: "Correlation between Pollutants and Hospital Admissions"
 
 ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
-  geom_point(alpha = 0.2, color = "steelblue") +
+  geom_point(alpha = 0.2, color = "#4682B4") +
   geom_smooth(method = "lm", se = TRUE, color = "red") +
   labs(
     title = "Correlation between Pollutants and Hospital Admissions",
-    subtitle = "PM2.5 is the only statistically significant predictor (p < 2e-16)",
+    subtitle = "PM2.5 is the only statistically significant predictor (p < 0.05)",
     x = "PM2.5",
     y = "Hospital Admissions"
   ) +
   theme_minimal()
 ```
 
+@fig-pm25-scatter presents a scatterplot and fitted regression line showing the relationship between PM2.5 concentration and hospital admissions. The positive slope of the regression line suggests that *hospital admissions tended to increase* as *PM2.5 concentrations increased*, supporting the relationship identified in the regression model.
 
-# Result 
-**Should be used in results**
-```{r}
-#Using correlation between PM2.5 particles and Hospital admission to provide evidence of relativeness between high pollution and hospital burden
+# Results
+With the help of @fig-pollution-hospital-comparison we have arrived to the following potential results: 
 
-plot1 <- ggplot(yearly_summary, aes(x = year, y = avg_pm25, color = city, group = city)) +
-  geom_line() +
-  geom_point() +
+* The top 3 most polluted cities generally recorded higher PM2.5 concentrations and greater hospital admissions compared with the least polluted cities.
+
+**Note**: A noticeable decline in `PM2.5` levels was observed from 2020 to 2021 across most cities. This was likely influenced by COVID-19 lockdowns and global shutdown measures, which reduced vehicle usage, industrial activity, and overall emissions. This has been duly reported through articles by (@Mao2020). Even cross-country evidence verified lockdown induced emission cuts lowered particulate pollution globally. (@Ma2024)
+
+* Beijing consistently showed the highest hospital burden, with daily hospital admissions increasing to almost 900 in 2025.
+
+* Cairo recorded large fluctuations in pollution levels and experienced the highest AQI level overall during 2024.
+
+* Among the least polluted cities, London and Mexico City showed relatively lower and more stable pollution levels, although moderate hospital admissions were still observed.
+
+* São Paulo recorded the highest `PM2.5` concentration in 2020 despite being classified among the least polluted cities based on average AQI. This reflects that other factors might have caused the city to not follow the general pattern.
+
+```{r comparison-plot}
+#| label: "fig-pollution-hospital-comparison"
+#| fig-cap: "Comparison of Pollution and Hospital Admissions Between the 3 Most Vs 3 Least Polluted Cities (2020–2025)"
+
+
+comparison_yearly_data <- yearly_summary |>
+
+  filter(
+    city %in% c(
+      top3_polluted_cities$city,
+      least3_polluted_cities$city
+    ),
+
+    year %in%
+      c("2020", "2021", "2022",
+        "2023", "2024", "2025")
+  )
+
+comparison_yearly_data <- comparison_yearly_data |>
+
+  mutate(
+    pollution_group = case_when(
+
+      city %in% top3_polluted_cities$city
+        ~ "Top 3 Most Polluted",
+
+      city %in% least3_polluted_cities$city
+        ~ "3 Least Polluted"
+    )
+  )
+
+# PM2.5 trend plot
+
+plot1 <- ggplot(
+  comparison_yearly_data,
+
+  aes(
+    x = year,
+    y = avg_pm25,
+    color = city,
+    linetype = pollution_group,
+    group = city
+  )
+) +
+
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+
   labs(
     title = "PM2.5 Trends by City",
     x = "Year",
-    y = "Average PM2.5",
-    color = "City"
+    y = "Average PM2.5"
   ) +
+
   theme_minimal()
 
-plot2 <- ggplot(yearly_summary, aes(x = year, y = avg_hospital, color = city, group = city)) +
-  geom_line() +
-  geom_point() +
+# Hospital admissions trend plot
+
+plot2 <- ggplot(
+  comparison_yearly_data,
+
+  aes(
+    x = year,
+    y = yearly_total_hospital,
+    color = city,
+    linetype = pollution_group,
+    group = city
+  )
+) +
+
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+
   labs(
     title = "Hospital Admissions by City",
     x = "Year",
-    y = "Average Hospital Admissions",
-    color = "City"
+    y = "Yearly Total Hospital Admissions"
   ) +
+
   theme_minimal()
 
-plot1 / plot2 +
+# Combine plots with shared legend
+
+(plot1 / plot2) +
+
+  plot_layout(guides = "collect") +
+
+  theme(
+    legend.position = "right",
+    legend.box = "vertical"
+  ) +
+
   plot_annotation(
-    title = "PM2.5 and Hospital Admissions Trends",
-    subtitle = "Top 5 Most Polluted Cities (2020-2025)"
+    title =
+      "Comparison of Pollution and Hospital Admissions",
+
+    subtitle =
+      "Top 3 Most vs 3 Least Polluted Cities (2020–2025)"
   )
+
 ```
 
 ```{r}
+# Most polluted year for the Top 3 and Least 3 polluted cities between 2020–2025
 
-aqi_long <- yearly_summary %>%
-  select(city,year,avg_aqi)
+most_polluted_year <- yearly_summary |>
 
-bar_aqi <- ggplot(aqi_long,aes(x=year,y=avg_aqi,fill=city))+
-  geom_col(position = position_dodge(width=0.9),width=0.8)+
-  labs(title="Annual Average AQI across five cities (2020-2025)",x="Year",y="Average AQI",fill="City")+
-  geom_vline(xintercept = "2020", linetype="dashed",color="black")+
-  theme_minimal()
+  filter(
+    city %in% c(
+      top3_polluted_cities$city,
+      least3_polluted_cities$city
+    ),
 
-bar_aqi
-```
+    year %in%
+      c("2020", "2021", "2022",
+        "2023", "2024", "2025")
+  ) |>
 
-**this is an extra filteration we can use in result**
+  group_by(city) |>
 
-```{r extra-info}
-# Identify top 5 most polluted months per city per year
-polluted_months <- yearly_data %>%
-  group_by(city, year) %>%
-  slice_max(avg_aqi, n = 5) %>%
-  ungroup()
+  slice_max(
+    order_by = avg_aqi,
+    n = 1,
+    with_ties = FALSE
+  ) |>
 
-# Most polluted year and month per city
-city_pollution_summary <- yearly_data %>%
-  group_by(city) %>%
-  summarise(
-    avg_aqi = mean(avg_aqi, na.rm = TRUE),
-    most_polluted_year = year[which.max(avg_aqi)],
-    most_polluted_month = month[which.max(avg_aqi)]
+  select(
+    city,
+    year,
+    avg_aqi,
+    avg_pm25
   )
 ```
-```{r}
-month_pollute_plot <- ggplot(polluted_months,aes(x=month,y=avg_aqi,fill=city))+
-  geom_col(position="dodge",alpha=0.7)+
-  facet_wrap(~city,scales="free_y",ncol=2)+
-  labs(title="Top 5 highest-AQI months per city each year",x="Month",y="Average AQI")+
-  theme_minimal()
 
-month_pollute_plot
+* @tbl-most-polluted-year identifies the most polluted year for each selected city based on AQI and PM2.5 concentrations. Cairo recorded the highest AQI value overall (417.60) in 2024, while São Paulo recorded the highest PM2.5 concentration (57.60) in 2020.
+
+* @fig-pm25-scatter further supports this relationship by showing a positive trend between PM2.5 concentration and hospital admissions.
+
+```{r most-polluted}
+#| label: "tbl-most-polluted-year"
+#| tbl-cap: "Most Polluted Year for the Top 3 and Least 3 Polluted Cities (2020–2025)"
+
+most_polluted_year |>
+
+  rename(
+    City = city,
+    `Most Polluted Year` = year,
+    `Average AQI` = avg_aqi,
+    `Average PM2.5` = avg_pm25
+  ) |>
+
+  kable(
+    caption =
+      "Most Polluted Year for the Top 3 and Least 3 Polluted Cities (2020–2025)",
+
+    digits = 2
+  ) |>
+
+  kable_styling(
+    latex_options =
+      c("striped", "hold_position")
+  ) |>
+
+  row_spec(
+    0,
+    bold = TRUE,
+    background = "#4CAF50",
+    color = "white"
+  )
 ```
 
-This section presents descriptive pollution trends across five selected high-pollution cities, multivariate regression outcomes quantifying pollutant-hospitalisation links, and supplementary monthly extreme-pollution analysis, supported by tabular summaries and graphical visualisations. All analysis covers 2020 to 2025 daily observational data aggregated into monthly and annual averages to mitigate short-run random fluctuations.
-
-## Annual Air Quality Descriptive Findings across Top 5 Cities
-
-Table 1 summarises annual average AQI values for Beijing, Cairo, Delhi, Los Angeles and São Paulo, the five cities filtered by long-run average AQI as the most polluted globally, while Figure 1 displays yearly AQI distribution via grouped bar charts.
-
-A distinct abnormal pollution trough was observed universally in 2020 across all five cities, consistent with COVID-19 pandemic restrictions: nationwide factory suspension, travel curbs and private vehicle reduction sharply cut industrial and traffic pollutant emissions. Most prominently, São Paulo recorded the highest baseline annual AQI of 392.00 in 2020 before a dramatic sustained decline to 190.08 by 2025, representing a near 52% drop in average pollution over six years. By contrast, Beijing maintained stable high AQI levels throughout the sample period, rising gradually from 272.85 (2020) to 289.64 (2025), with limited pollution improvement. Cairo exhibited the largest year-on-year volatility, peaking at 417.60 AQI in 2024 followed by a steep fall to 193.14 in 2025. Delhi and Los Angeles saw mild, modest fluctuations within a narrow AQI band between roughly 215 and 265 across all years with no clear long-term rising or falling trend.
-
-Figure 2 presents paired time-series line graphs tracking annual average PM2.5 concentrations and corresponding annual hospital admission volumes separately for each city from 2020–2025. Visually synchronous co-movement is evident: years with falling PM2.5 concentrations consistently correspond to lower average hospital admissions, most notably for São Paulo, whose sharp post-2020 PM2.5 reduction coincides with a persistent downtrend in hospital intake counts. The vertical dashed marker for 2020 further confirms the pandemic-driven synchronous drop of both pollution and hospital admissions across all sample cities.
-
-## Multivariate Linear Regression: Pollutants and Hospital Admissions
-
-A multiple linear regression model was estimated with daily hospital admissions as the dependent variable and five core air pollutants (AQI, PM2.5, PM10, NO2, O3) as explanatory predictors. Full regression coefficient outputs are documented in the report’s regression summary table, with key statistical outcomes outlined below:
-
-First, the overall regression model is statistically significant at the 1% level (F-statistic = 3219, p < 2.2×10^(-16)), confirming the combined set of five pollutant variables collectively explains meaningful variation in hospital admission levels. The adjusted R-squared equals 0.1539, meaning approximately 15.39% of total fluctuations in hospital admission numbers can be attributed to the five measured air pollutants; the remaining 84.61% of admission variation is driven by unmodelled confounding factors including population demographics, seasonal respiratory disease outbreaks, local healthcare infrastructure and epidemic shocks such as COVID-19.
-
-At individual variable level, only PM2.5 delivers statistically significant positive association with hospital admissions (p < 2×10^(-16)). Its estimated coefficient is 0.0987, indicating that holding all other pollutants fixed, a one-unit increase in PM2.5 concentration leads to an average rise of 0.0987 daily hospital admissions. In contrast, AQI (p=0.620), PM10 (p=0.852), NO2 (p=0.834) and O3 (p=0.378) all return p-values well above the standard 5% significance threshold, providing no robust statistical evidence of independent causal impacts on hospital admission volumes after controlling for PM2.5 and other co-pollutants.
-
-Figure 3’s scatter plot with fitted linear regression further validates this core finding: raw daily observations show an obvious upward-sloping fitted regression line between PM2.5 and hospital admissions, with narrow 95% confidence band implying stable positive linear correlation across the full dataset. The figure’s subtitle explicitly notes PM2.5 as the sole statistically meaningful pollutant driver of hospital intake, consistent with regression coefficient results.
-
-## Supplementary Monthly Extreme Pollution Analysis
-
-To deepen granular pollution assessment, monthly-level filtering was applied to extract the top five highest-AQI months per city annually across 2020–2025, visualised in faceted bar charts in Figure 4. Meanwhile, a supplementary city-level summary table identifies the single calendar year and month recording peak historical AQI for each location.
-
-Substantial seasonal clustering of severe pollution is observed across all five cities: peak high-AQI months predominantly concentrate within late autumn and winter months (October–February), which aligns with stagnant meteorological conditions including low temperature, weak atmospheric dispersion and enhanced fossil fuel consumption for heating that trap particulate pollutants near ground level. Summer months generally feature substantially lower monthly average AQI values due to improved air convection and rainfall washing out airborne pollutants.
-
-Cross-verification against monthly hospital admission data demonstrates that months classified as top-tier heavy pollution consistently correspond to above-average monthly hospital admissions for each respective city. This monthly granular evidence independently corroborates the core conclusion from annual trends and regression modelling that elevated PM2.5-driven air pollution is positively linked to increased healthcare admission burdens across high-pollution urban environments.
-
-## Concluding remark for Results section
-
-Combined evidence from annual trend graphs, regression results and monthly pollution data confirms PM2.5 is the key pollutant raising hospital admissions. Annual charts show PM2.5 and admissions move in tandem, regression proves only PM2.5 is statistically significant, and monthly data finds high-pollution months always come with higher hospital intake across the five cities.
+**Overall, the findings suggest that increasing PM2.5 concentrations were associated with increased hospital burden between 2020 and 2025.**
 
 # Discussion
+The analysis indicates a positive relationship between air pollution and hospital admissions, particularly for PM2.5 concentrations. Cities with higher pollution levels generally recorded greater hospital burden, supporting existing research linking particulate pollution with respiratory health issues. 
 
-The results of this study suggest a positive association between air pollution and hospital admissions across the five highly polluted cities from 2020 to 2025. Among all pollutant variables included in the multiple linear regression model, PM2.5 was the only statistically significant predictor of hospital admissions. This indicates that, after controlling for AQI, PM10, NO2, and O3, PM2.5 remained the most important pollutant associated with increased healthcare system loading.
+The regression model further identified PM2.5 as the strongest predictor of hospital admissions among all selected pollutants.
 
-The annual trends show that air pollution patterns varied substantially across cities. Beijing maintained consistently high AQI levels throughout the study period, suggesting a persistent air pollution burden. Cairo showed the largest year-to-year fluctuation, especially with a sharp peak in 2024, indicating that its air quality may be strongly affected by annual changes in climate, energy use, or urban activity. São Paulo experienced a major decline after 2020, suggesting an improvement in average pollution levels over the period. Delhi and Los Angeles showed more moderate fluctuations, with no clear long-term upward or downward trend. These differences suggest that air pollution is highly city-specific and should not be interpreted through a single general pattern.
+**Several limitations** should be acknowledged: 
 
-The regression findings provide stronger evidence for the importance of PM2.5. The estimated coefficient for PM2.5 was 0.0987, meaning that, holding other pollutants constant, a one-unit increase in PM2.5 was associated with an average increase of approximately 0.0987 daily hospital admissions. Although this effect may appear small at the unit level, sustained exposure to high PM2.5 concentrations across large urban populations can create meaningful pressure on healthcare systems. The upward-sloping fitted line in the scatterplot also supports this relationship, showing that higher PM2.5 levels are generally associated with higher hospital admission counts.
+* First, the dataset only included a limited number of cities (8), reducing the ability to generalise findings globally. The data does not carry data prior to 2020, which makes it difficult to establish a pre-Covid baseline for both hospital admissions and air quality metrics.
 
-However, the analysis has several limitations. The adjusted R-squared value of 0.1539 indicates that the model explains only around 15.39% of the variation in hospital admissions. This means that many other factors, such as population size, age structure, chronic disease prevalence, healthcare access, seasonal respiratory illness, COVID-19 effects, and public health policies, are not captured in the model. In addition, because this study uses observational data, the results should be interpreted as evidence of association rather than direct causation. Differences in data collection methods across cities may also affect comparability.
+* Second, hospital admissions may also be influenced by factors not included in the analysis, such as population size and density, healthcare accessibility, socioeconomic conditions, smoking prevalence, and public health policies. 
 
-Overall, the findings have important public health implications. In highly polluted cities, PM2.5 should be treated as a key environmental indicator for predicting healthcare pressure. Rather than relying only on broad AQI measures, policymakers and healthcare planners should pay closer attention to fine particulate matter, especially during high-pollution seasons or months.
+* Third, yearly aggregation may hide short-term pollution spikes and seasonal health impacts.
+
+* Fourth, the dataset has been taken at the courtesy of the [Kaggle](https://www.kaggle.com/datasets/tfisthis/global-air-quality-and-respiratory-health-outcomes) platform and hence cannot be relied to make any real-world conclusions or predictive analysis, based on the findings. It has been used solely for illustrative purposes and to build understanding of the health environment. 
+
+In addition, cities classified as “least polluted” are according to the dataset and not the current global scenarios. However, they recorded high pollution values within the dataset, indicating that pollution remains a concern for these cities. The analysis also focused only on correlation rather than any direct causation.
 
 # Conclusion
 
-This report examined air quality and hospital admission data from five highly polluted cities between 2020 and 2025, with the aim of understanding whether air pollution is associated with healthcare system loading. Using annual AQI summaries, PM2.5 and hospital admission trend graphs, multiple linear regression, and supplementary monthly pollution analysis, the study found that PM2.5 was the pollutant most strongly associated with hospital admissions.
+This study examined the relationship between air pollution and hospital admissions across selected cities between 2020 and 2025. The findings demonstrated that cities with higher pollution levels generally experienced greater hospital burden. 
 
-Although AQI, PM10, NO2, and O3 were not statistically significant in the regression model, PM2.5 showed a highly significant and positive relationship with hospital admissions. This means that, after controlling for other pollutants, higher PM2.5 levels were generally associated with higher hospital admission counts. The annual and monthly visualisations also support this conclusion, as periods of higher PM2.5 or heavier pollution tended to correspond with increased hospital admissions.
+`PM2.5` was identified as the most statistically significant pollutant associated with hospital admissions. Both the regression model and visualisations showed a positive relationship between `PM2.5` concentration and healthcare demand.
 
-However, air pollution is not the only factor affecting hospital admissions. Since the model explains only part of the variation in hospital intake, the findings should be interpreted as evidence of a significant association rather than direct causal proof. Future research could provide a more complete explanation by including population characteristics, seasonal disease patterns, healthcare capacity, and public health policy variables.
-
-Overall, the key conclusion of this report is that PM2.5 is the most important pollutant indicator among the five selected high-pollution cities, showing a significant positive association with hospital admissions and potentially increasing pressure on urban healthcare systems.
 
 # Recommendations
 
-Based on the findings, highly polluted cities should prioritise the monitoring and control of PM2.5. Since PM2.5 was the only statistically significant pollutant predictor in the regression model, governments and environmental agencies should not rely only on overall AQI values. Instead, they should pay closer attention to daily PM2.5 changes, long-term trends, and seasonal pollution peaks. During winter and high-pollution months, early warning systems should be used to advise residents to reduce outdoor exposure.
+On the basis of the above study and analysis on the dataset. Here are the following recommendation from 6it Consultants:
 
-Cities should adopt more targeted PM2.5 reduction strategies. These may include stricter industrial emission controls, greater use of clean energy, restrictions on high-emission vehicles, improved public transport, and encouragement of low-carbon travel. For cities such as Beijing and Cairo, where pollution levels remain high or volatile, policy should focus on continuous monitoring and rapid response. For cities such as São Paulo, where pollution appears to have declined substantially, further investigation could identify which policies or conditions contributed to improvement.
+* Governments should strengthen environmental regulations aimed at reducing PM2.5 emissions from traffic, industrial activities, and urban pollution sources.
 
-Healthcare systems should incorporate air pollution data into hospital resource planning. Since higher PM2.5 levels are associated with increased hospital admissions, hospitals could prepare additional respiratory care resources, emergency staff, and bed capacity during high-pollution periods. Public health agencies could also use PM2.5 forecasts to warn high-risk groups, such as elderly people, children, asthma patients, and people with chronic respiratory diseases.
+* Healthcare systems in highly polluted cities should improve hospital preparedness and respiratory healthcare capacity.
 
-Future research should improve the dataset and modelling approach. Additional control variables should be included, such as population size, age structure, healthcare capacity, seasonality, temperature, humidity, influenza outbreaks, and COVID-19 effects. This would help reduce omitted variable bias and improve the explanatory power of the model. City fixed effects or year fixed effects could also be used to better separate city-specific differences from time-based changes.
+* Future studies should include additional variables, such as population density, healthcare access, and socioeconomic conditions to improve analysis accuracy.
 
+* Future investigation should take a more longitudinal approach, to better understand the impacts of Covid, and its associated lockdowns, on both air quality and hospital admissions, and to establish a clearer pre-Covid baseline.
 
+* Future research using daily or seasonal data may provide deeper insight into short-term pollution impacts on respiratory health.
+
+* Public awareness campaigns should encourage protective measures during periods of poor air quality.
