@@ -398,8 +398,19 @@ plot2 <- ggplot(
 ```{r}
 # Most polluted year for the Top 3 and Least 3 polluted cities between 2020–2025
 
-most_polluted_year <- yearly_summary |>
+aqi_long <- yearly_summary %>%
+  select(city,year,avg_aqi)
 
+bar_aqi <- ggplot(aqi_long,aes(x=year,y=avg_aqi,fill=city))+
+  geom_col(position = position_dodge(width=0.9),width=0.8)+
+  labs(title="Annual Average AQI across five cities (2020-2025)",x="Year",y="Average AQI",fill="City")+
+  geom_vline(xintercept = "2020", linetype="dashed",color="black")+
+  theme_minimal()
+
+bar_aqi
+```
+
+```{r}
   filter(
     city %in% c(
       top3_polluted_cities$city,
@@ -497,6 +508,8 @@ On the basis of the above study and analysis on the dataset. Here are the follow
 * Governments should strengthen environmental regulations aimed at reducing PM2.5 emissions from traffic, industrial activities, and urban pollution sources.
 
 * Healthcare systems in highly polluted cities should improve hospital preparedness and respiratory healthcare capacity.
+
+* Cities with consistently high PM2.5 levels could develop early warning systems to alert vulnerable groups, such as older adults, children, and people with respiratory conditions.
 
 * Future studies should include additional variables, such as population density, healthcare access, and socioeconomic conditions to improve analysis accuracy.
 
