@@ -13,7 +13,9 @@ author:
 phone: (03) 9905 2478
 email: BusEco-Econometrics@monash.edu
 organization: 6it Consultants
-bibliography: references.bib
+bibliography: 
+  - references.bib
+  - packages.bib
 toc: true
 format: report-pdf
 ---
@@ -46,6 +48,23 @@ library(knitr)
 library(patchwork)
 library(kableExtra)
 library(broom)
+```
+
+```{r create-package-bib}
+knitr::write_bib(
+  c(
+    "tidyverse",
+    "lubridate",
+    "here",
+    "ggplot2",
+    "knitr",
+    "patchwork",
+    "kableExtra",
+    "broom"
+  ),
+  "packages.bib"
+)
+
 ```
 
 ```{r reading-data}
