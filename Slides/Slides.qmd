@@ -298,6 +298,10 @@ The regression analysis revealed that `PM2.5` levels were significantly positive
 
 ## Results
 
+::: columns
+
+::: {.column width="58%"}
+
 ```{r comparison-plot}
 #| label: "fig-pollution-hospital-comparison"
 #| fig-cap: "Comparison of Pollution and Hospital Admissions Between the 3 Most Vs 3 Least Polluted Cities (2020–2025)"
@@ -394,6 +398,22 @@ plot2 <- ggplot(
     legend.box = "vertical"
   )
 ```
+
+:::
+
+::: {.column width="42%"}
+
+::: {style="font-size: 0.8em;"}
+
+- The 3 most polluted cities recorded higher PM2.5 levels and greater hospital admissions, while the least polluted cities showed lower and more stable trends.
+- PM2.5 levels declined sharply from 2020 to 2021, likely due to COVID-19 lockdowns reducing emissions.
+- Similar trends between pollution levels and hospital admissions suggest a relationship between air pollution and healthcare burden.
+
+:::
+
+:::
+
+:::
 
 ## Limitations
 
