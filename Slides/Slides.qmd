@@ -57,14 +57,15 @@ knitr::write_bib(
 )
 ```
 
-## Introduction
+## Problem Introduction
 
 ::: columns
 
 ::: {.column width="60%"}
 - Air pollution is a major public health issue causing respiratory problems leading to increased hospital admissions
-- This presentation analyzes the relationship between air quality and respiratory health, focusing on healthcare system loading
 - We will explore data on air pollution levels and hospital admissions in 8 major cities across 2020–2025
+- This presentation will examine how air pollution has affected hospital intakes in the most polluted cities in the years 2020-2025
+
 :::
 
 ::: {.column width="40%"}
@@ -73,7 +74,13 @@ knitr::write_bib(
 
 :::
 
-# How has air pollution affected hospital intakes in the most polluted cities in years 2020-2025?
+## Dataset Exploration
+
+- The dataset contained daily air quality and healthcare observations from eight cities between 2020 and 2025. 
+
+- Key variables included: `Air Quality Index (AQI)`, `PM2.5`, `PM10`, `NO2`, `O3`, `temperature`, `humidity`, `hospital admissions`, and `hospital capacity`. 
+
+- Daily observations were aggregated into monthly summaries and then yearly summaries to reduce short-term fluctuations and improve trend interpretation.
 
 ## Methodology
 
@@ -97,15 +104,9 @@ The following ibraries were used for date handling, plotting, table formatting, 
 
 :::
 
-## Dataset Exploration
+## Results
 
-- The dataset contained daily air quality and healthcare observations from eight cities between 2020 and 2025. 
 
-- Key variables included: `Air Quality Index (AQI)`, `PM2.5`, `PM10`, `NO2`, `O3`, `temperature`, `humidity`, `hospital admissions`, and `hospital capacity`. 
-
-- Daily observations were aggregated into monthly summaries and then yearly summaries to reduce short-term fluctuations and improve trend interpretation.
-
-## Something
 
 ## Something more
 
