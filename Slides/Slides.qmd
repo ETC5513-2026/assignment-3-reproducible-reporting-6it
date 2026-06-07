@@ -294,7 +294,188 @@ ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
 
 :::
 
+The regression analysis revealed that `PM2.5` levels were significantly positively associated with `hospital admissions` (p < 0.05), while other pollutants did not show a statistically significant relationship.
+
 ## Results
+
+::: columns
+
+::: {.column width="50%"}
+
+```{r comparison-plot}
+#| label: "fig-pollution-hospital-comparison"
+#| fig-cap: "Comparison of Pollution and Hospital Admissions Between the 3 Most Vs 3 Least Polluted Cities (2020–2025)"
+
+
+comparison_yearly_data <- yearly_summary |>
+
+  filter(
+    city %in% c(
+      top3_polluted_cities$city,
+      least3_polluted_cities$city
+    ),
+
+    year %in%
+      c("2020", "2021", "2022",
+        "2023", "2024", "2025")
+  )
+
+comparison_yearly_data <- comparison_yearly_data |>
+
+  mutate(
+    pollution_group = case_when(
+
+      city %in% top3_polluted_cities$city
+        ~ "Top 3 Most Polluted",
+
+      city %in% least3_polluted_cities$city
+        ~ "3 Least Polluted"
+    )
+  )
+
+# PM2.5 trend plot
+
+plot1 <- ggplot(
+  comparison_yearly_data,
+
+  aes(
+    x = year,
+    y = avg_pm25,
+    color = city,
+    linetype = pollution_group,
+    group = city
+  )
+) +
+
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+
+  labs(
+    title = "PM2.5 Trends by City",
+    x = "Year",
+    y = "Average PM2.5"
+  ) +
+
+  theme_minimal()
+
+# Hospital admissions trend plot
+
+plot2 <- ggplot(
+  comparison_yearly_data,
+
+  aes(
+    x = year,
+    y = yearly_total_hospital,
+    color = city,
+    linetype = pollution_group,
+    group = city
+  )
+) +
+
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+
+  labs(
+    title = "Hospital Admissions by City",
+    x = "Year",
+    y = "Yearly Total Hospital Admissions"
+  ) +
+
+  theme_minimal()
+
+# Combine plots with shared legend
+
+(plot1 / plot2) +
+
+  plot_layout(guides = "collect") +
+
+  theme(
+    legend.position = "right",
+    legend.box = "vertical"
+  ) +
+
+  plot_annotation(
+    title =
+      "Comparison of Pollution and Hospital Admissions",
+
+    subtitle =
+      "Top 3 Most vs 3 Least Polluted Cities (2020–2025)"
+  )
+
+```
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+# Most polluted year for the Top 3 and Least 3 polluted cities between 2020–2025
+
+most_polluted_year <- yearly_summary |>
+
+  filter(
+    city %in% c(
+      top3_polluted_cities$city,
+      least3_polluted_cities$city
+    ),
+
+    year %in%
+      c("2020", "2021", "2022",
+        "2023", "2024", "2025")
+  ) |>
+
+  group_by(city) |>
+
+  slice_max(
+    order_by = avg_aqi,
+    n = 1,
+    with_ties = FALSE
+  ) |>
+
+  select(
+    city,
+    year,
+    avg_aqi,
+    avg_pm25
+  )
+```
+
+```{r most-polluted}
+#| label: "tbl-most-polluted-year"
+#| tbl-cap: "Most Polluted Year for the Top 3 and Least 3 Polluted Cities (2020–2025)"
+
+most_polluted_year |>
+
+  rename(
+    City = city,
+    `Most Polluted Year` = year,
+    `Average AQI` = avg_aqi,
+    `Average PM2.5` = avg_pm25
+  ) |>
+
+  kable(
+    digits = 2
+  ) |>
+
+  kable_styling(
+    bootstrap_options = c("striped", "condensed"),
+    full_width = FALSE,
+    font_size = 22
+  ) |>
+
+  row_spec(
+    0,
+    bold = TRUE,
+    background = "#4CAF50",
+    color = "white"
+  )
+```
+
+:::
+
+:::
+
+
 
 ## Limitations
 
