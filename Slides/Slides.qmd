@@ -1,89 +1,114 @@
 ---
-title: "Air Quality and Respiratory Health: An Analysis on Healthcare System Loading"
+title: "Air Quality and Respiratory Health: <br> An Analysis on Healthcare System Loading"
 author: "6it Consultants"
 date: today
 toc: false
+bibliography: 
+  - references.bib
+  - packages.bib
 format:
   presentation-revealjs+letterbox: default
 ---
 
-```{r}
-#| label: load-packages
+```{r loading-library}
 #| include: false
-library(knitr)
+
+library(tidyverse)
+library(lubridate)
+library(here)
 library(ggplot2)
-library(dplyr)
-options(width = 70)
+library(knitr)
+library(patchwork)
+library(kableExtra)
+library(broom)
 ```
 
-# Goals
+```{r reading-data}
+#| include: false
 
-## Goals
-
-
-The main goals for this slide:
-
-- This is just to show you how this \emph{template} works
-- The blue in this template is based on the official Monash University color palette
-
-### beamer options
-
-- Use the `titlegraphic` option to include a different background image for the title slide
-- Use the `titlecolor` option to change the color for the text on the title slide.
-
-# Tables and graphs
-
-## Slide 2
-
-A nice table
-
-```{r}
-mtcars |>
-  select(mpg:wt) |>
-  head() |>
-  kable(booktabs = TRUE)
+airquality_data <- read_csv(here("data/air_quality.csv"))
 ```
 
-## Slide 3
+```{r tidying-data}
+#| include: false
 
-And a graph
-
-```{r}
-#| fig-height: 3.8
-mtcars |>
-  ggplot(aes(x=wt, y = mpg)) +
-  geom_point()
+airquality_data<- airquality_data |> 
+  mutate(
+    month = month(date, label = TRUE, abbr= TRUE),
+    year = as.factor(year(date))
+  )
 ```
 
-## Slide 4
+```{r build-package-bib}
+#|include: false
 
-The sample standard deviation is given by
-$$
-  s = \sqrt{\frac{1}{n-1} \sum_{i=1}^n (x_i - \bar{x})^2}
-$$
-
-## Testing monospace font
-
-```{r}
-#| echo: true
-mtcars |> as_tibble() |> head()
+knitr::write_bib(
+  c(
+    "tidyverse",
+    "lubridate",
+    "here",
+    "ggplot2",
+    "knitr",
+    "patchwork",
+    "kableExtra",
+    "broom"
+  ),
+  "packages.bib"
+)
 ```
 
+## Introduction
 
-## Testing math fonts
+::: columns
 
-* Calligraphic
+::: {.column width="60%"}
+- Air pollution is a major public health issue causing respiratory problems leading to increased hospital admissions
+- This presentation analyzes the relationship between air quality and respiratory health, focusing on healthcare system loading
+- We will explore data on air pollution levels and hospital admissions in 8 major cities across 2020–2025
+:::
 
-  * $\mathcal{ABCDE}$
+::: {.column width="40%"}
+![Credit: Thoracic and Sleep Group](air-polution-illustration.png){width="100%"}
+:::
 
-* Script
+:::
 
-  * $\mathscr{ABCDE}$
+# How has air pollution affected hospital intakes in the most polluted cities in years 2020-2025?
 
-* Fraktur
+## Methodology
 
-  * $\mathfrak{ABCDE}$
+The analysis was conducted using R and several packages from the `tidyverse` [@R-tidyverse] ecosystem for data cleaning, transformation, modelling, and visualisation. 
 
-* Mathbb
+The following ibraries were used for date handling, plotting, table formatting, and regression analysis:
 
-  * $\mathbb{ABCDE}$
+::: {style="font-size: 0.8em;"}
+
+- `lubridate` [@R-lubridate] for date manipulation
+
+- `ggplot2` [@R-ggplot2] for data visualisation
+
+- `patchwork` [@R-patchwork] for combining multiple plots
+
+- `kableExtra` [@R-kableExtra] for enhanced table formatting
+
+- `broom` [@R-broom] for tidying regression outputs
+
+- `here` [@R-here] for reproducible file paths
+
+:::
+
+## Dataset Exploration
+
+- The dataset contained daily air quality and healthcare observations from eight cities between 2020 and 2025. 
+
+- Key variables included: `Air Quality Index (AQI)`, `PM2.5`, `PM10`, `NO2`, `O3`, `temperature`, `humidity`, `hospital admissions`, and `hospital capacity`. 
+
+- Daily observations were aggregated into monthly summaries and then yearly summaries to reduce short-term fluctuations and improve trend interpretation.
+
+## Something
+
+## Something more
+
+## Yet more something
+
+## References
