@@ -104,12 +104,12 @@ The following ibraries were used for date handling, plotting, table formatting, 
 
 :::
 
+## Regression
+
 ## Results
 
+## Limitations
 
-
-## Something more
-
-## Yet more something
+## Recommendation
 
 ## References
