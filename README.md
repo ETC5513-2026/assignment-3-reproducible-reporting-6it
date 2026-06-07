@@ -9,4 +9,4 @@ Group Members:
 
 Topic: 
 
-**How does poor air quality affect respiratory health outcomes aross different countries or regions? How does this affect hospital intakes?**
+**How has airpollution affected hospital intakes in the most polluted cities in years 2020-2025**

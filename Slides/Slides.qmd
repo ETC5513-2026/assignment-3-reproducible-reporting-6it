@@ -1,89 +1,286 @@
 ---
-title: Air Quality and Respiratory Health: An Analysis on Healthcare System Loading
-author: Hypatia of Alexandria
+title: "Air Quality and Respiratory Health: <br> An Analysis on Healthcare System Loading"
+author: "6it Consultants"
 date: today
 toc: false
-format: # Use only one of these
+bibliography: 
+  - references.bib
+  - packages.bib
+format:
   presentation-revealjs+letterbox: default
 ---
 
-```{r}
-#| label: load-packages
+```{r loading-library}
 #| include: false
-library(knitr)
+
+library(tidyverse)
+library(lubridate)
+library(here)
 library(ggplot2)
-library(dplyr)
-options(width = 70)
+library(knitr)
+library(patchwork)
+library(kableExtra)
+library(broom)
 ```
 
-# Goals
+```{r reading-data}
+#| include: false
 
-## Goals
-
-
-The main goals for this slide:
-
-- This is just to show you how this \emph{template} works
-- The blue in this template is based on the official Monash University color palette
-
-### beamer options
-
-- Use the `titlegraphic` option to include a different background image for the title slide
-- Use the `titlecolor` option to change the color for the text on the title slide.
-
-# Tables and graphs
-
-## Slide 2
-
-A nice table
-
-```{r}
-mtcars |>
-  select(mpg:wt) |>
-  head() |>
-  kable(booktabs = TRUE)
+airquality_data <- read_csv(here("data/air_quality.csv"))
 ```
 
-## Slide 3
+```{r tidying-data}
+#| include: false
 
-And a graph
-
-```{r}
-#| fig-height: 3.8
-mtcars |>
-  ggplot(aes(x=wt, y = mpg)) +
-  geom_point()
+airquality_data<- airquality_data |> 
+  mutate(
+    month = month(date, label = TRUE, abbr= TRUE),
+    year = as.factor(year(date))
+  )
 ```
 
-## Slide 4
+```{r build-package-bib}
+#|include: false
 
-The sample standard deviation is given by
-$$
-  s = \sqrt{\frac{1}{n-1} \sum_{i=1}^n (x_i - \bar{x})^2}
-$$
+knitr::write_bib(
+  c(
+    "tidyverse",
+    "lubridate",
+    "here",
+    "ggplot2",
+    "knitr",
+    "patchwork",
+    "kableExtra",
+    "broom"
+  ),
+  "packages.bib"
+)
+```
 
-## Testing monospace font
+## Problem Introduction
 
-```{r}
-#| echo: true
-mtcars |> as_tibble() |> head()
+::: columns
+
+::: {.column width="60%"}
+- Air pollution is a major public health issue causing respiratory problems leading to increased hospital admissions
+- We will explore data on air pollution levels and hospital admissions in 8 major cities across 2020–2025
+- This presentation will examine how air pollution has affected hospital intakes in the most polluted cities in the years 2020-2025
+
+:::
+
+::: {.column width="40%"}
+![Credit: Thoracic and Sleep Group](air-polution-illustration.png){width="100%"}
+:::
+
+:::
+
+## Dataset Exploration
+
+- The dataset contained daily air quality and healthcare observations from eight cities between 2020 and 2025. 
+
+- Key variables included: `Air Quality Index (AQI)`, `PM2.5`, `PM10`, `NO2`, `O3`, `temperature`, `humidity`, `hospital admissions`, and `hospital capacity`. 
+
+- Daily observations were aggregated into monthly summaries and then yearly summaries to reduce short-term fluctuations and improve trend interpretation.
+
+## Methodology
+
+The analysis was conducted using R and several packages from the `tidyverse` [@R-tidyverse] ecosystem for data cleaning, transformation, modelling, and visualisation. 
+
+The following ibraries were used for date handling, plotting, table formatting, and regression analysis:
+
+::: {style="font-size: 0.8em;"}
+
+- `lubridate` [@R-lubridate] for date manipulation
+
+- `ggplot2` [@R-ggplot2] for data visualisation
+
+- `patchwork` [@R-patchwork] for combining multiple plots
+
+- `kableExtra` [@R-kableExtra] for enhanced table formatting
+
+- `broom` [@R-broom] for tidying regression outputs
+
+- `here` [@R-here] for reproducible file paths
+
+:::
+
+## Regression
+
+```{r classification-of-data}
+# Step 2 — Club all daily data into monthly summaries
+
+monthly_summary <- airquality_data |>
+
+  group_by(city, year, month) |>
+
+  summarise(
+    avg_aqi = mean(aqi, na.rm = TRUE),
+    avg_pm25 = mean(pm2_5, na.rm = TRUE),
+    avg_pm10 = mean(pm10, na.rm = TRUE),
+    avg_no2 = mean(no2, na.rm = TRUE),
+    avg_o3 = mean(o3, na.rm = TRUE),
+
+    avg_temperature =
+      mean(temperature, na.rm = TRUE),
+
+    avg_humidity =
+      mean(humidity, na.rm = TRUE),
+
+    total_hospital =
+      sum(hospital_admissions, na.rm = TRUE),
+
+    avg_hospital_capacity =
+      mean(hospital_capacity, na.rm = TRUE),
+
+    .groups = "drop"
+  )
+
+# Step 3 — Club all months into yearly summaries
+
+yearly_summary <- monthly_summary |>
+
+  group_by(city, year) |>
+    summarise(
+    avg_aqi = mean(avg_aqi, na.rm = TRUE),
+    avg_pm25 = mean(avg_pm25, na.rm = TRUE),
+    avg_pm10 = mean(avg_pm10, na.rm = TRUE),
+    avg_no2 = mean(avg_no2, na.rm = TRUE),
+    avg_o3 = mean(avg_o3, na.rm = TRUE),
+
+    avg_temperature =
+      mean(avg_temperature, na.rm = TRUE),
+
+    avg_humidity =
+      mean(avg_humidity, na.rm = TRUE),
+
+    yearly_total_hospital =
+      sum(total_hospital, na.rm = TRUE),
+
+    avg_hospital_capacity =
+      mean(avg_hospital_capacity, na.rm = TRUE),
+
+    .groups = "drop"
+  )
 ```
 
 
-## Testing math fonts
+```{r top-3-polluted-cities}
+# step 3
+top3_polluted_cities <- yearly_summary |>
 
-* Calligraphic
+  filter(
+    year %in%
+      c("2020", "2021", "2022",
+        "2023", "2024", "2025")
+  ) |>
 
-  * $\mathcal{ABCDE}$
+  group_by(city) |>
 
-* Script
+  summarise(
+    overall_avg_aqi =
+      mean(avg_aqi, na.rm = TRUE),
 
-  * $\mathscr{ABCDE}$
+    overall_total_hospital =
+      sum(yearly_total_hospital,
+          na.rm = TRUE),
 
-* Fraktur
+    overall_avg_capacity =
+      mean(avg_hospital_capacity,
+           na.rm = TRUE),
 
-  * $\mathfrak{ABCDE}$
+    .groups = "drop"
+  ) |>
 
-* Mathbb
+  arrange(
+    desc(overall_avg_aqi)
+  ) |>
 
-  * $\mathbb{ABCDE}$
+  slice_head(n = 3)
+
+```
+
+```{r 3-least-polluted-cities}
+least3_polluted_cities <- yearly_summary |>
+
+  filter(
+    year %in%
+      c("2020", "2021", "2022",
+        "2023", "2024", "2025")
+  ) |>
+
+  group_by(city) |>
+
+  summarise(
+
+    overall_avg_aqi =
+      mean(avg_aqi, na.rm = TRUE),
+
+    overall_total_hospital =
+      sum(yearly_total_hospital,
+          na.rm = TRUE),
+
+    overall_avg_capacity =
+      mean(avg_hospital_capacity,
+           na.rm = TRUE),
+
+    .groups = "drop"
+  ) |>
+
+  arrange(
+    overall_avg_aqi
+  ) |>
+
+  slice_head(n = 3)
+```
+
+```{r Model-PM25-HospitalAdmission-Correlation}
+#| echo: false
+#| include: false
+correlation_model <-lm(hospital_admissions ~ aqi + pm2_5 + pm10 + no2 + o3,
+data = airquality_data)
+
+summary(correlation_model)
+```
+```{r regression-table}
+#| fig-pos: "H"
+#| label: "tbl-regression-results"
+#| tbl-cap: "Linear Regression Results for Hospital Admissions"
+
+#Plotting Linear Regg Table
+
+tidy(correlation_model) |>
+
+  rename(
+    Variable = term,
+    Coefficient = estimate,
+    `Standard Error` = std.error,
+    `t value` = statistic,
+    `p value` = p.value
+  ) |>
+
+  kable(
+    digits = 4
+  ) |>
+
+  kable_styling(
+    latex_options =
+      c("striped", "hold_position")
+  ) |>
+
+  row_spec(
+    0,
+    bold = TRUE,
+    background = "#4682B4",
+    color = "white"
+  )
+
+```
+
+
+## Results
+
+## Limitations
+
+## Recommendation
+
+## References
