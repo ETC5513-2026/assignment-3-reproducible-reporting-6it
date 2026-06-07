@@ -65,7 +65,6 @@ knitr::write_bib(
 - Air pollution is a major public health issue causing respiratory problems leading to increased hospital admissions
 - We will explore data on air pollution levels and hospital admissions in 8 major cities across 2020–2025
 - This presentation will examine how air pollution has affected hospital intakes in the most polluted cities in the years 2020-2025
-
 :::
 
 ::: {.column width="40%"}
@@ -86,7 +85,7 @@ knitr::write_bib(
 
 The analysis was conducted using R and several packages from the `tidyverse` [@R-tidyverse] ecosystem for data cleaning, transformation, modelling, and visualisation. 
 
-The following ibraries were used for date handling, plotting, table formatting, and regression analysis:
+The following ibraries were used:
 
 ::: {style="font-size: 0.8em;"}
 
@@ -163,7 +162,6 @@ yearly_summary <- monthly_summary |>
   )
 ```
 
-
 ```{r top-3-polluted-cities}
 # step 3
 top3_polluted_cities <- yearly_summary |>
@@ -196,7 +194,6 @@ top3_polluted_cities <- yearly_summary |>
   ) |>
 
   slice_head(n = 3)
-
 ```
 
 ```{r 3-least-polluted-cities}
@@ -241,13 +238,14 @@ data = airquality_data)
 
 summary(correlation_model)
 ```
+
+::: columns
+
+::: {.column width="50%"}
 ```{r regression-table}
 #| fig-pos: "H"
 #| label: "tbl-regression-results"
 #| tbl-cap: "Linear Regression Results for Hospital Admissions"
-
-#Plotting Linear Regg Table
-
 tidy(correlation_model) |>
 
   rename(
@@ -263,8 +261,7 @@ tidy(correlation_model) |>
   ) |>
 
   kable_styling(
-    latex_options =
-      c("striped", "hold_position")
+    font_size = 22
   ) |>
 
   row_spec(
@@ -273,9 +270,29 @@ tidy(correlation_model) |>
     background = "#4682B4",
     color = "white"
   )
-
 ```
+:::
 
+::: {.column width="50%"}
+```{r correlation-plot}
+#| fig-pos: "H"
+#| label: "fig-pm25-scatter"
+#| fig-cap: "Correlation between Pollutants and Hospital Admissions"
+
+ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
+  geom_point(alpha = 0.2, color = "#4682B4") +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(
+    title = "Correlation between Pollutants and Hospital Admissions",
+    subtitle = "PM2.5 is the only statistically significant predictor (p < 0.05)",
+    x = "PM2.5",
+    y = "Hospital Admissions"
+  ) +
+  theme_minimal()
+```
+:::
+
+:::
 
 ## Results
 
