@@ -65,7 +65,6 @@ knitr::write_bib(
 - Air pollution is a major public health issue causing respiratory problems leading to increased hospital admissions
 - We will explore data on air pollution levels and hospital admissions in 8 major cities across 2020–2025
 - This presentation will examine how air pollution has affected hospital intakes in the most polluted cities in the years 2020-2025
-
 :::
 
 ::: {.column width="40%"}
@@ -86,7 +85,7 @@ knitr::write_bib(
 
 The analysis was conducted using R and several packages from the `tidyverse` [@R-tidyverse] ecosystem for data cleaning, transformation, modelling, and visualisation. 
 
-The following ibraries were used for date handling, plotting, table formatting, and regression analysis:
+The following ibraries were used:
 
 ::: {style="font-size: 0.8em;"}
 
@@ -163,7 +162,6 @@ yearly_summary <- monthly_summary |>
   )
 ```
 
-
 ```{r top-3-polluted-cities}
 # step 3
 top3_polluted_cities <- yearly_summary |>
@@ -196,7 +194,6 @@ top3_polluted_cities <- yearly_summary |>
   ) |>
 
   slice_head(n = 3)
-
 ```
 
 ```{r 3-least-polluted-cities}
@@ -241,13 +238,14 @@ data = airquality_data)
 
 summary(correlation_model)
 ```
+
+::: columns
+
+::: {.column width="50%"}
 ```{r regression-table}
 #| fig-pos: "H"
 #| label: "tbl-regression-results"
 #| tbl-cap: "Linear Regression Results for Hospital Admissions"
-
-#Plotting Linear Regg Table
-
 tidy(correlation_model) |>
 
   rename(
@@ -263,8 +261,7 @@ tidy(correlation_model) |>
   ) |>
 
   kable_styling(
-    latex_options =
-      c("striped", "hold_position")
+    font_size = 22
   ) |>
 
   row_spec(
@@ -273,14 +270,181 @@ tidy(correlation_model) |>
     background = "#4682B4",
     color = "white"
   )
-
 ```
+:::
 
+::: {.column width="50%"}
+```{r correlation-plot}
+#| fig-pos: "H"
+#| label: "fig-pm25-scatter"
+#| fig-cap: "Correlation between Pollutants and Hospital Admissions"
+
+ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
+  geom_point(alpha = 0.2, color = "#4682B4") +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(
+    title = "Correlation between Pollutants and Hospital Admissions",
+    subtitle = "PM2.5 is the only statistically significant predictor (p < 0.05)",
+    x = "PM2.5",
+    y = "Hospital Admissions"
+  ) +
+  theme_minimal()
+```
+:::
+
+:::
+
+The regression analysis revealed that `PM2.5` levels were significantly positively associated with `hospital admissions` (p < 0.05), while other pollutants did not show a statistically significant relationship.
 
 ## Results
 
+::: columns
+
+::: {.column width="58%"}
+
+```{r comparison-plot}
+#| label: "fig-pollution-hospital-comparison"
+#| fig-cap: "Comparison of Pollution and Hospital Admissions Between the 3 Most Vs 3 Least Polluted Cities (2020–2025)"
+
+
+comparison_yearly_data <- yearly_summary |>
+
+  filter(
+    city %in% c(
+      top3_polluted_cities$city,
+      least3_polluted_cities$city
+    ),
+
+    year %in%
+      c("2020", "2021", "2022",
+        "2023", "2024", "2025")
+  )
+
+comparison_yearly_data <- comparison_yearly_data |>
+
+  mutate(
+    pollution_group = case_when(
+
+      city %in% top3_polluted_cities$city
+        ~ "3 Most Polluted",
+
+      city %in% least3_polluted_cities$city
+        ~ "3 Least Polluted"
+    )
+  )
+
+# PM2.5 trend plot
+
+plot1 <- ggplot(
+  comparison_yearly_data,
+
+  aes(
+    x = year,
+    y = avg_pm25,
+    color = city,
+    linetype = pollution_group,
+    group = city
+  )
+) +
+
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+
+  labs(
+    title = "PM2.5 Trends by City",
+    x = "Year",
+    y = "Average PM2.5",
+    color = "City",
+    linetype = "Pollution Category"
+) +
+
+  theme_minimal()
+
+# Hospital admissions trend plot
+
+plot2 <- ggplot(
+  comparison_yearly_data,
+
+  aes(
+    x = year,
+    y = yearly_total_hospital,
+    color = city,
+    linetype = pollution_group,
+    group = city
+  )
+) +
+
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+
+  labs(
+  title = "Hospital Admissions by City",
+  x = "Year",
+  y = "Yearly Total Hospital Admissions",
+  color = "City",
+  linetype = "Pollution Category"
+) +
+
+  theme_minimal()
+
+# Combine plots with shared legend
+
+(plot1 / plot2) +
+
+  plot_layout(guides = "collect") +
+
+  theme(
+    legend.position = "right",
+    legend.box = "vertical"
+  )
+```
+
+:::
+
+::: {.column width="42%"}
+
+::: {style="font-size: 0.8em;"}
+
+- The 3 most polluted cities recorded higher PM2.5 levels and greater hospital admissions, while the least polluted cities showed lower and more stable trends.
+- PM2.5 levels declined sharply from 2020 to 2021, likely due to COVID-19 lockdowns reducing emissions.
+- Similar trends between pollution levels and hospital admissions suggest a relationship between air pollution and healthcare burden.
+
+:::
+
+:::
+
+:::
+
 ## Limitations
 
+::: {style="font-size: 0.85em;"}
+
+- First, the dataset only included a limited number of cities (8), reducing the ability to generalise findings globally. The data does not carry data prior to 2020, which makes it difficult to establish a pre-Covid baseline for both hospital admissions and air quality metrics.
+
+- Second, hospital admissions may also be influenced by factors not included in the analysis, such as population size and density, healthcare accessibility, socioeconomic conditions, smoking prevalence, and public health policies. 
+
+- Third, yearly aggregation may hide short-term pollution spikes and seasonal health impacts.
+
+- Fourth, the dataset has been taken at the courtesy of the [Kaggle](https://www.kaggle.com/datasets/tfisthis/global-air-quality-and-respiratory-health-outcomes) platform and hence cannot be relied to make any real-world conclusions or predictive analysis, based on the findings. It has been used solely for illustrative purposes and to build understanding of the health environment. 
+
+:::
+
 ## Recommendation
+
+::: {style="font-size: 0.825em;"}
+
+* Governments should strengthen environmental regulations aimed at reducing PM2.5 emissions from traffic, industrial activities, and urban pollution sources.
+
+* Healthcare systems in highly polluted cities should improve hospital preparedness and respiratory healthcare capacity.
+
+* Future studies should include additional variables, such as population density, healthcare access, and socioeconomic conditions to improve analysis accuracy.
+
+* Future investigation should take a more longitudinal approach, to better understand the impacts of Covid, and its associated lockdowns, on both air quality and hospital admissions, and to establish a clearer pre-Covid baseline.
+
+* Future research using daily or seasonal data may provide deeper insight into short-term pollution impacts on respiratory health.
+
+* Public awareness campaigns should encourage protective measures during periods of poor air quality.
+
+:::
 
 ## References
