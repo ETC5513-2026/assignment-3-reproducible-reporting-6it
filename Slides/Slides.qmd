@@ -64,7 +64,7 @@ knitr::write_bib(
 ::: {.column width="60%"}
 - Air pollution is a major public health issue causing respiratory problems leading to increased hospital admissions
 - We will explore data on air pollution levels and hospital admissions in 8 major cities across 2020–2025
-- This presentation will examine how air pollution has affected hospital intakes in the most polluted cities in the years 2020-2025
+- This presentation will examine how air pollution has affected hospital intakes in the years 2020-2025
 :::
 
 ::: {.column width="40%"}
