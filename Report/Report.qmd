@@ -460,7 +460,7 @@ most_polluted_year |>
 
   kable(
     caption =
-      "Most Polluted Year for the Top 3 and Least 3 Polluted Cities (2020–2025)",
+      "Most Polluted Year for the 3 Most and Least 3 Polluted Cities (2020–2025)",
 
     digits = 2
   ) |>
