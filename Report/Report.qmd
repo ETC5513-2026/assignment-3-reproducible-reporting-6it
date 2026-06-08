@@ -496,9 +496,11 @@ The regression model further identified PM2.5 as the strongest predictor of hosp
 
 * Third, yearly aggregation may hide short-term pollution spikes and seasonal health impacts.
 
-* Fourth, the dataset has been taken at the courtesy of the [Kaggle](https://www.kaggle.com/datasets/tfisthis/global-air-quality-and-respiratory-health-outcomes) platform and hence cannot be relied to make any real-world conclusions or predictive analysis, based on the findings. It has been used solely for illustrative purposes and to build understanding of the health environment. 
+* Fourth, the dataset has been taken at the courtesy of the [Kaggle](https://www.kaggle.com/datasets/tfisthis/global-air-quality-and-respiratory-health-outcomes) platform and hence cannot be relied to make any real-world conclusions or predictive analysis, based on the findings. It has been used solely for illustrative purposes and to build understanding of the health environment.
 
 In addition, cities classified as “least polluted” are according to the dataset and not the current global scenarios. However, they recorded high pollution values within the dataset, indicating that pollution remains a concern for these cities. The analysis also focused only on correlation rather than any direct causation.
+
+**Disclaimer:** The dataset used in this analysis is poorly formatted for date-time, which was not noticed until after the analysis was completed. As a result, the values may have large discrepancies from real-world cases, but are as accurate as possible given the structure of the data.
 
 # Conclusion
 
