@@ -35,9 +35,9 @@ This report investigates how air pollution has affected hospital admissions betw
 The study used descriptive analysis, visualisations, and regression modelling to examine whether higher pollution levels were associated with increased hospital burden, with a *particular focus on `PM2.5` concentrations*.
 
 # Methodology
-**Question to investigate:** [*How has air pollution affected hospital intakes in the most polluted cities in years 2020-2025?*]{.underline}
+**Question to investigate:** [*How has air pollution affected hospital intakes in the years 2020-2025?*]{.underline}
 
-The analysis was conducted using R and several packages from the `tidyverse` ecosystem for data cleaning, transformation, modelling, and visualisation. Libraries were used for date handling, plotting, table formatting, and regression analysis.
+The analysis was conducted using R and several packages from the `tidyverse` [@R-tidyverse] ecosystem for data cleaning, transformation, modelling, and visualisation. Libraries were used for date handling, plotting, table formatting, and regression analysis.
 
 ```{r loading-library}
 library(tidyverse)
@@ -261,6 +261,8 @@ tidy(correlation_model) |>
 
 ```{r correlation-plot}
 #| fig-pos: "H"
+#| fig-width: 4
+#| fig-height: 2.5
 #| label: "fig-pm25-scatter"
 #| fig-cap: "Correlation between Pollutants and Hospital Admissions"
 
@@ -279,25 +281,11 @@ ggplot(airquality_data, aes(x = pm2_5, y = hospital_admissions)) +
 @fig-pm25-scatter presents a scatterplot and fitted regression line showing the relationship between PM2.5 concentration and hospital admissions. The positive slope of the regression line suggests that *hospital admissions tended to increase* as *PM2.5 concentrations increased*, supporting the relationship identified in the regression model.
 
 # Results
-With the help of @fig-pollution-hospital-comparison we have arrived to the following potential results: 
 
-* The top 3 most polluted cities generally recorded higher PM2.5 concentrations and greater hospital admissions compared with the least polluted cities.
+Further, we plotted the trends of PM2.5 concentrations and hospital admissions for the three most polluted and three least polluted cities between 2020 and 2025.
 
-**Note**: A noticeable decline in `PM2.5` levels was observed from 2020 to 2021 across most cities. This was likely influenced by COVID-19 lockdowns and global shutdown measures, which reduced vehicle usage, industrial activity, and overall emissions. This has been duly reported through articles by (@Mao2020). Even cross-country evidence verified lockdown induced emission cuts lowered particulate pollution globally. (@Ma2024)
-
-* Beijing consistently showed the highest hospital burden, with daily hospital admissions increasing to almost 900 in 2025.
-
-* Cairo recorded large fluctuations in pollution levels and experienced the highest AQI level overall during 2024.
-
-* Among the least polluted cities, London and Mexico City showed relatively lower and more stable pollution levels, although moderate hospital admissions were still observed.
-
-* São Paulo recorded the highest `PM2.5` concentration in 2020 despite being classified among the least polluted cities based on average AQI. This reflects that other factors might have caused the city to not follow the general pattern.
 
 ```{r comparison-plot}
-#| label: "fig-pollution-hospital-comparison"
-#| fig-cap: "Comparison of Pollution and Hospital Admissions Between the 3 Most Vs 3 Least Polluted Cities (2020–2025)"
-
-
 comparison_yearly_data <- yearly_summary |>
 
   filter(
@@ -317,7 +305,7 @@ comparison_yearly_data <- comparison_yearly_data |>
     pollution_group = case_when(
 
       city %in% top3_polluted_cities$city
-        ~ "Top 3 Most Polluted",
+        ~ "3 Most Polluted",
 
       city %in% least3_polluted_cities$city
         ~ "3 Least Polluted"
@@ -344,8 +332,10 @@ plot1 <- ggplot(
   labs(
     title = "PM2.5 Trends by City",
     x = "Year",
-    y = "Average PM2.5"
-  ) +
+    y = "Average PM2.5",
+    color = "City",
+    linetype = "Pollution Category"
+) +
 
   theme_minimal()
 
@@ -367,12 +357,23 @@ plot2 <- ggplot(
   geom_point(size = 2) +
 
   labs(
-    title = "Hospital Admissions by City",
-    x = "Year",
-    y = "Yearly Total Hospital Admissions"
-  ) +
+  title = "Hospital Admissions by City",
+  x = "Year",
+  y = "Yearly Total Hospital Admissions",
+  color = "City",
+  linetype = "Pollution Category"
+) +
 
   theme_minimal()
+
+```
+
+```{r display-plots}
+#| label: "fig-pollution-hospital-comparison"
+#| fig-pos: "H"
+#| fig-width: 6
+#| fig-height: 5
+#| fig-cap: "Comparison of Pollution and Hospital Admissions Between the 3 Most Vs 3 Least Polluted Cities (2020–2025)"
 
 # Combine plots with shared legend
 
@@ -390,10 +391,24 @@ plot2 <- ggplot(
       "Comparison of Pollution and Hospital Admissions",
 
     subtitle =
-      "Top 3 Most vs 3 Least Polluted Cities (2020–2025)"
+      "3 Most vs 3 Least Polluted Cities (2020–2025)"
   )
 
 ```
+
+With the help of @fig-pollution-hospital-comparison, we find that: 
+
+* The 3 most polluted cities generally recorded higher PM2.5 concentrations and greater hospital admissions compared with the least polluted cities.
+
+**Note**: A noticeable decline in `PM2.5` levels was observed from 2020 to 2021 across most cities. This was likely influenced by COVID-19 lockdowns and global shutdown measures, which reduced vehicle usage, industrial activity, and overall emissions. This has been duly reported through articles by (@Mao2020). Even cross-country evidence verified lockdown induced emission cuts lowered particulate pollution globally. (@Ma2024)
+
+* Beijing consistently showed the highest hospital burden, with daily hospital admissions increasing to almost 900 in 2025.
+
+* Cairo recorded large fluctuations in pollution levels and experienced the highest AQI level overall during 2024 (417.60).
+
+* Among the least polluted cities, London and Mexico City showed relatively lower and more stable pollution levels, although moderate hospital admissions were still observed.
+
+* São Paulo recorded the highest `PM2.5` concentration in 2020 despite being classified among the least polluted cities based on average AQI. This reflects that other factors might have caused the city's high PM2.5 levels.
 
 ```{r}
 # Most polluted year for the Top 3 and Least 3 polluted cities between 2020–2025
@@ -427,13 +442,12 @@ most_polluted_year <- yearly_summary |>
   )
 ```
 
-* @tbl-most-polluted-year identifies the most polluted year for each selected city based on AQI and PM2.5 concentrations. Cairo recorded the highest AQI value overall (417.60) in 2024, while São Paulo recorded the highest PM2.5 concentration (57.60) in 2020.
-
-* @fig-pm25-scatter further supports this relationship by showing a positive trend between PM2.5 concentration and hospital admissions.
-
 ```{r most-polluted}
+#| fig-pos: "H"
+#| fig-width: 5
+#| fig-height: 5
 #| label: "tbl-most-polluted-year"
-#| tbl-cap: "Most Polluted Year for the Top 3 and Least 3 Polluted Cities (2020–2025)"
+#| tbl-cap: "Most Polluted Year for the 3 Most and 3 Least Polluted Cities (2020–2025)"
 
 most_polluted_year |>
 
@@ -464,9 +478,12 @@ most_polluted_year |>
   )
 ```
 
+@tbl-most-polluted-year identifies the most polluted year for each selected city based on AQI and PM2.5 concentrations. Cairo recorded the highest AQI value overall (417.60) in 2024, while São Paulo recorded the highest PM2.5 concentration (57.60) in 2020.
+
 **Overall, the findings suggest that increasing PM2.5 concentrations were associated with increased hospital burden between 2020 and 2025.**
 
 # Discussion
+
 The analysis indicates a positive relationship between air pollution and hospital admissions, particularly for PM2.5 concentrations. Cities with higher pollution levels generally recorded greater hospital burden, supporting existing research linking particulate pollution with respiratory health issues. 
 
 The regression model further identified PM2.5 as the strongest predictor of hospital admissions among all selected pollutants.
