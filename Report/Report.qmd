@@ -504,4 +504,6 @@ On the basis of the above study and analysis on the dataset. Here are the follow
 
 * Future research using daily or seasonal data may provide deeper insight into short-term pollution impacts on respiratory health.
 
+* Cities with consistently high PM2.5 levels could develop early warning systems to alert vulnerable groups, such as older adults, children, and people with respiratory conditions.
+
 * Public awareness campaigns should encourage protective measures during periods of poor air quality.
