@@ -209,7 +209,7 @@ least3_polluted_cities <- yearly_summary |>
   slice_head(n = 3)
 ```
 
-A multiple linear regression model was used to examine the relationship between air pollutants and hospital admissions. `Hospital admissions` were treated as the dependent variable, while `AQI`, `PM2.5`, `PM10`, `NO2`, and `O3` were used as predictor variables. The regression results shown in @tbl-regression-results indicate that PM2.5 was the only statistically significant predictor of hospital admissions used further for analysis. 
+A multiple linear regression model was used to examine the relationship between air pollutants and hospital admissions. `Hospital admissions` were treated as the dependent variable, while `AQI`, `PM2.5`, `PM10`, `NO2`, and `O3` were used as predictor variables. 
 
 ```{r Model-PM25-HospitalAdmission-Correlation}
 #| echo: false
