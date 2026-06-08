@@ -24,13 +24,13 @@ format: report-pdf
 
 # Executive summary
 
-This report investigates the relationship between air pollution and hospital admissions between 2020 and 2025. The analysis compared the three most polluted and three least polluted cities using AQI, PM2.5, and hospital admission data. Regression analysis showed that PM2.5 was the only statistically significant pollutant associated with hospital admissions. Overall, the findings suggest that higher PM2.5 concentrations leading to higher AQI, were linked to increased hospital burden across the selected cities.
+This report investigates the relationship between air pollution and hospital admissions caused due to respiratory conditions between 2020 and 2025. The analysis compared the three most polluted and three least polluted cities using AQI, PM2.5, and hospital admission data. Regression analysis showed that PM2.5 was the only statistically significant pollutant associated with hospital admissions. Overall, the findings suggest that higher PM2.5 concentrations leading to higher AQI, were linked to increased hospital burden across the selected cities.
 
 # Introduction
 
 Air pollution is a major public health issue causing respiratory problems leading to increased hospital admissions. Pollutants such as `PM2.5`, `PM10`, `NO2`, and `O3` can negatively affect human health, especially in high concentrations, which are commonly found in urbanised cities. Among these pollutants, `PM2.5` is considered particularly harmful because it can penetrate deep into the lungs.
 
-This report investigates how air pollution has affected hospital admissions between 2020 and 2025, using air quality and healthcare data from eight cities. Cities were ranked based on average AQI levels, allowing comparison between the **three most polluted** and **three least polluted** cities in the dataset.
+This report investigates how air pollution has affected hospital admissions due to respiratory issues between 2020 and 2025, using air quality and healthcare data from eight cities. Cities were ranked based on average AQI levels, allowing comparison between the **three most polluted** and **three least polluted** cities in the dataset.
 
 The study used descriptive analysis, visualisations, and regression modelling to examine whether higher pollution levels were associated with increased hospital burden, with a *particular focus on `PM2.5` concentrations*.
 
@@ -373,7 +373,7 @@ plot2 <- ggplot(
 #| fig-pos: "H"
 #| fig-width: 6
 #| fig-height: 5
-#| fig-cap: "Comparison of Pollution and Hospital Admissions Between the 3 Most Vs 3 Least Polluted Cities (2020–2025)"
+#| fig-cap: "Comparing Hospital Admissions due to respiratory issues and increased PM2.5 particles "
 
 # Combine plots with shared legend
 
